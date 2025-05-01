@@ -147,15 +147,19 @@ public class InstituicaoService {
     }
 
     @Transactional
-    public ResponseEntity<String> register(String nome, String email, String password, String nascimento) {
+    public ResponseEntity<String> register(String nome, String email, Integer cnpj, String areaInstituicao,  String password, String descricao) {
         try {
             Optional<Instituicao> existingInstituicao = instituicaoRepository.findByEmail(email);
             if (existingInstituicao.isPresent()) {
                 return ResponseEntity.badRequest().body("E-mail já registrado.");
             }
             Instituicao instituicao = new Instituicao();
+            instituicao.setNome(nome);
             instituicao.setEmail(email);
-            instituicao.setPassword(passwordEncoder.encode(password));
+            instituicao.setCnpj(cnpj);
+            instituicao.setAreaInstituicao(areaInstituicao);
+            instituicao.setPassword(password);
+            instituicao.setDescricao(descricao);
 
             instituicaoRepository.save(instituicao);
             return ResponseEntity.ok("Usuário registrado com sucesso!");

@@ -147,7 +147,7 @@ public Voluntario create(Voluntario voluntario) {
     }
 
     @Transactional
-    public ResponseEntity<String> register(String nome, String email, String password, String nascimento) {
+    public ResponseEntity<String> register(String nome, String email, String password, String areaInteresse, String competencia) {
         try {
             Optional<Voluntario> existingVoluntario = voluntarioRepository.findByEmail(email);
             if (existingVoluntario.isPresent()) {
@@ -157,7 +157,9 @@ public Voluntario create(Voluntario voluntario) {
             voluntario.setNome(nome);
             voluntario.setEmail(email);
             voluntario.setPassword(passwordEncoder.encode(password));
-            voluntario.setNascimento(LocalDate.parse(nascimento));
+            voluntario.setInteresse(areaInteresse);
+            voluntario.setCompetencia(competencia);
+
 
             voluntarioRepository.save(voluntario);
             return ResponseEntity.ok("Usuário registrado com sucesso!");
