@@ -12,25 +12,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()  // Desabilita CSRF e ativa CORS
-                .authorizeRequests()
-
-                // Endpoints públicos (acessíveis sem autenticação)
-                .antMatchers(
-                        "/api/v1/instituicao/login",   // Login de instituição
-                        "/api/v1/voluntario/login",    // Login de voluntário
-                        "/api/vagasInstituicao/**",    // Endpoints de vagas acessíveis a todos
-                        "/api/voluntarios",            // Endpoints de voluntários acessíveis a todos
-                        "/api/v1/perfil-instituicao/**",  // Endpoint de Perfil instituição
-                        "/api/vagas",                  // Endpoint de vagas
-                        "/api/candidaturas/**"            // Endpoint de candidaturas
-                ).permitAll()  // Permitir acesso a estas rotas sem autenticação
-
-                // Endpoints que exigem autenticação
-                .antMatchers().authenticated()
-
-                // Qualquer outra rota não mencionada exige autenticação
-                .anyRequest().authenticated();
+        http.cors().and().csrf().disable()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/v1/instituicao/login",
+                                "/api/v1/voluntario/login",
+                                "/api/vagasInstituicao/**",
+                                "/api/voluntarios",
+                                "/api/v1/perfil-instituicao/**",
+                                "/api/vagas",
+                                "/api/candidaturas/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                );
 
         return http.build();
     }

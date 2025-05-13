@@ -1,5 +1,6 @@
 package org.example.voluntariadointeligentehub.controller;
 
+import jakarta.validation.Valid;
 import org.example.voluntariadointeligentehub.entity.PerfilInstituicao;
 import org.example.voluntariadointeligentehub.service.CadastroInstituicaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 

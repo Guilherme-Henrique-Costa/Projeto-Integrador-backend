@@ -1,5 +1,6 @@
 package org.example.voluntariadointeligentehub.controller;
 
+import jakarta.validation.Valid;
 import org.example.voluntariadointeligentehub.entity.Voluntario;
 import org.example.voluntariadointeligentehub.service.CadastroVoluntarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Map;
 
 @RestController

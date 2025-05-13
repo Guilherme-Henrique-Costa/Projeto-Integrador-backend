@@ -1,6 +1,8 @@
 package org.example.voluntariadointeligentehub.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+
 import java.util.List;
 
 @Entity
