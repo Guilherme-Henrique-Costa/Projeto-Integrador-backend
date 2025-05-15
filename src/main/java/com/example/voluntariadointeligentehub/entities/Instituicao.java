@@ -18,7 +18,7 @@ public class Instituicao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int cnpj;
+    private String cnpj;
 
     @Column(length = 60)
     private String email;
@@ -27,7 +27,7 @@ public class Instituicao {
     private String password;
     
     @Column(length = 240)
-    private String descricao;
+    private String description;
 
     private int vgaAbrtInstru;
 
@@ -44,9 +44,14 @@ public class Instituicao {
 
     private int vltInstituicao;
 
+    @Column(length = 150)
+    private String competence;
+
     private String nomeVltInstituicao;
 
     private String descricaoInstituicao;
+
+    private String interestArea;
 
     @OneToOne(mappedBy = "instituicao", cascade = CascadeType.ALL)
     private PerfilInstituicao perfilInstituicao;
@@ -61,10 +66,10 @@ public class Instituicao {
 
     public Instituicao(
         Long id,
-        int cnpj,
+        String cnpj,
         String email,
         String password,
-        String descricao,
+        String description,
         int vgaAbrtInstru,
         String avaliacao,
         String nome,
@@ -72,6 +77,7 @@ public class Instituicao {
         String areaInstituicao,
         int rltIntituicao,
         int vltInstituicao,
+        String competence,
         String nomeVltInstituicao,
         String descricaoInstituicao,
         Voluntario voluntario
@@ -81,7 +87,7 @@ public class Instituicao {
         this.cnpj = cnpj;
         this.email = email;
         this.password = password;
-        this.descricao = descricao;
+        this.description = description;
         this.vgaAbrtInstru = vgaAbrtInstru;
         this.avaliacao = avaliacao;
         this.nome = nome;
@@ -89,13 +95,18 @@ public class Instituicao {
         this.areaInstituicao = areaInstituicao;
         this.rltIntituicao = rltIntituicao;
         this.vltInstituicao = vltInstituicao;
+        this.competence = competence;
         this.nomeVltInstituicao = nomeVltInstituicao;
         this.descricaoInstituicao = descricaoInstituicao;
         this.voluntario = voluntario;
     }
 
     //Getters
-    public int getCnpj() {
+    public Long getId() {
+        return id;
+    }
+
+    public String getCnpj() {
         return cnpj;
     }
 
@@ -107,8 +118,8 @@ public class Instituicao {
         return password;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getDescription() {
+        return description;
     }
 
     public int getVgaAbrtInstru() {
@@ -139,6 +150,10 @@ public class Instituicao {
         return vltInstituicao;
     }
 
+    public String getCompetence() {
+        return competence;
+    }
+
     public String getNomeVltInstituicao() {
         return nomeVltInstituicao;
     }
@@ -157,7 +172,11 @@ public class Instituicao {
 
 
     //Setters
-    public void setCnpj(int cnpj) {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCnpj(String cnpj) {
         this.cnpj = cnpj;
     }
 
@@ -169,8 +188,8 @@ public class Instituicao {
         this.password = password;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setVgaAbrtInstru(int vgaAbrtInstru){
@@ -195,6 +214,14 @@ public class Instituicao {
 
     public void setRltIntituicao(int rltIntituicao){
         this.rltIntituicao = rltIntituicao;
+    }
+
+    public void setVltInstituicao(int vltInstituicao) {
+        this.vltInstituicao = vltInstituicao;
+    }
+
+    public void setCompetence(String competence) {
+        this.competence = competence;
     }
 
     public void setDescricaoInstituicao(String descricaoInstituicao){

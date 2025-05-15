@@ -72,8 +72,8 @@ public class VoluntarioController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestParam String nome, @RequestParam String email, @RequestParam String password, @RequestParam String areaInteresse, @RequestParam String competencia) {
-        return voluntarioService.register(nome, email, password, areaInteresse, competencia);
+    public ResponseEntity<String> register(@RequestParam String nome, @RequestParam String email, @RequestParam String password, @RequestParam String interestArea, @RequestParam String competence) {
+        return voluntarioService.register(nome, email, password, interestArea, competence);
     }
     
     @PostMapping("/login")

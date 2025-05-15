@@ -114,7 +114,7 @@ public class InstituicaoService {
                 instituicao.setCnpj(instituicaoDetails.getCnpj());
                 instituicao.setEmail(instituicaoDetails.getEmail());
                 instituicao.setPassword(instituicaoDetails.getPassword());
-                instituicao.setDescricao(instituicaoDetails.getDescricao());
+                instituicao.setDescription(instituicaoDetails.getDescription());
                 instituicao.setVgaAbrtInstru(instituicaoDetails.getVgaAbrtInstru());
                 instituicao.setAvaliacao(instituicaoDetails.getAvaliacao());
                 instituicao.setNome(instituicaoDetails.getNome());
@@ -147,7 +147,7 @@ public class InstituicaoService {
     }
 
     @Transactional
-    public ResponseEntity<String> register(String nome, String email, Integer cnpj, String areaInstituicao,  String password, String descricao) {
+    public ResponseEntity<String> register(String nome, String email, String cnpj, String areaInstituicao,  String password, String descricao) {
         try {
             Optional<Instituicao> existingInstituicao = instituicaoRepository.findByEmail(email);
             if (existingInstituicao.isPresent()) {
@@ -159,7 +159,7 @@ public class InstituicaoService {
             instituicao.setCnpj(cnpj);
             instituicao.setAreaInstituicao(areaInstituicao);
             instituicao.setPassword(password);
-            instituicao.setDescricao(descricao);
+            instituicao.setDescription(descricao);
 
             instituicao.setPassword(passwordEncoder.encode(password));
 

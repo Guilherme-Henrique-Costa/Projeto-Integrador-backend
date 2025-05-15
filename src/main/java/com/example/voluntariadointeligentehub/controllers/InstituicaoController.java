@@ -70,8 +70,8 @@ public class InstituicaoController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestParam String nome, @RequestParam String email,@RequestParam Integer cnpj, @RequestParam String areaInstituicao,  @RequestParam String password, @RequestParam String descricao) {
-        return instituicaoService.register(nome, email, cnpj, areaInstituicao, password, descricao);
+    public ResponseEntity<String> register(@RequestParam String nome, @RequestParam String email,@RequestParam String cnpj, @RequestParam String interestArea,  @RequestParam String password, @RequestParam String description, @RequestParam String co) {
+        return instituicaoService.register(nome, email, cnpj, interestArea, password, description);
     }
 
     @PostMapping("/login")

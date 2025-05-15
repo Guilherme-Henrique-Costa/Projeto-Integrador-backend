@@ -39,7 +39,7 @@ public class Voluntario implements Serializable {
 
     private String interesse;
 
-    private String competencia;
+    private String competence;
 
     @Column(length = 240)
     private String fdbk;
@@ -75,7 +75,7 @@ public class Voluntario implements Serializable {
             String email,
             String password,
             String interesse,
-            String competencia,
+            String competence,
             LocalDate nascimento,
             String descricaoVaga,
             String fdbk
@@ -84,7 +84,7 @@ public class Voluntario implements Serializable {
         this.email = email;
         this.password = password;
         this.interesse = interesse;
-        this.competencia = competencia;
+        this.competence = competence;
         this.nascimento = nascimento;
         this.descricaoVaga = descricaoVaga;
         this.fdbk = fdbk;
@@ -111,8 +111,8 @@ public class Voluntario implements Serializable {
         return interesse;
     }
 
-    public String getCompetencia() {
-        return competencia;
+    public String getCompetence() {
+        return competence;
     }
 
     public LocalDate getNascimento() {
@@ -164,8 +164,8 @@ public class Voluntario implements Serializable {
         this.interesse = interesse;
     }
 
-    public void setCompetencia(String competencia) {
-        this.competencia = competencia;
+    public void setCompetence(String competence) {
+        this.competence = competence;
     }
 
     public void setNascimento(LocalDate nascimento) {

@@ -119,7 +119,7 @@ public Voluntario create(Voluntario voluntario) {
                 voluntario.setPassword(passwordEncoder.encode(voluntarioDetails.getPassword()));
                 voluntario.setNascimento(voluntarioDetails.getNascimento());
                 voluntario.setInteresse(voluntarioDetails.getInteresse());
-                voluntario.setCompetencia(voluntarioDetails.getCompetencia());
+                voluntario.setCompetence(voluntarioDetails.getCompetence());
                 voluntario.setDescricaoVaga(voluntarioDetails.getDescricaoVaga());
 
                 return Optional.of(voluntarioRepository.save(voluntario));
@@ -147,7 +147,7 @@ public Voluntario create(Voluntario voluntario) {
     }
 
     @Transactional
-    public ResponseEntity<String> register(String nome, String email, String password, String areaInteresse, String competencia) {
+    public ResponseEntity<String> register(String nome, String email, String password, String interestArea, String competence) {
         try {
             Optional<Voluntario> existingVoluntario = voluntarioRepository.findByEmail(email);
             if (existingVoluntario.isPresent()) {
@@ -157,8 +157,8 @@ public Voluntario create(Voluntario voluntario) {
             voluntario.setNome(nome);
             voluntario.setEmail(email);
             voluntario.setPassword(passwordEncoder.encode(password));
-            voluntario.setInteresse(areaInteresse);
-            voluntario.setCompetencia(competencia);
+            voluntario.setInteresse(interestArea);
+            voluntario.setCompetence(competence);
 
             voluntarioRepository.save(voluntario);
             return ResponseEntity.ok("Usuário registrado com sucesso!");

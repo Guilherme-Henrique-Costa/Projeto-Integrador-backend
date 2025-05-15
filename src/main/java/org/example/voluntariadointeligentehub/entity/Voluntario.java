@@ -35,8 +35,8 @@ public class Voluntario {
     @NotNull(message = "A data de nascimento é obrigatória")
     private LocalDate dataNascimento;
 
-    private String areaInteresse;
-    private String competencia;
+    private String interestArea;
+    private String competence;
 
     // Getters e Setters
     public Long getId() {
@@ -79,19 +79,19 @@ public class Voluntario {
         this.dataNascimento = dataNascimento;
     }
 
-    public String getAreaInteresse() {
-        return areaInteresse;
+    public String getInterestArea() {
+        return interestArea;
     }
 
-    public void setAreaInteresse(String areaInteresse) {
-        this.areaInteresse = areaInteresse;
+    public void setInterestArea(String interestArea) {
+        this.interestArea = interestArea;
     }
 
-    public String getCompetencia() {
-        return competencia;
+    public String getCompetence() {
+        return competence;
     }
 
-    public void setCompetencia(String competencia) {
-        this.competencia = competencia;
+    public void setCompetence(String competence) {
+        this.competence = competence;
     }
 }
