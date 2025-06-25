@@ -1,93 +1,35 @@
 package com.example.voluntariadointeligentehub.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "tb_vagas_voluntarias")
 public class VagasVoluntarias {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String descricaoVaga;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vaga_id", nullable = false)
+    private VagaInstituicao vaga;
 
-    private String area;
-
-    private String vagaAbrt;
-
-    private String vlt;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voluntario_id", nullable = false)
     private Voluntario voluntario;
-    
-    public VagasVoluntarias() {
 
-    }
+    private LocalDate dataCandidatura;
 
-    public VagasVoluntarias(
-        Long id,
-        String descricaoVaga,
-        String area,
-        String vagaAbrt,
-        String vlt,
-        Voluntario voluntario
-        ) {
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-        this.id = id;
-        this.descricaoVaga = descricaoVaga;
-        this.area = area;
-        this.vagaAbrt = vagaAbrt;
-        this.vlt = vlt;
-        this.voluntario = voluntario;
-    }
+    public VagaInstituicao getVaga() { return vaga; }
+    public void setVaga(VagaInstituicao vaga) { this.vaga = vaga; }
 
-    //Getters
-    public String getDescricaoVaga() {
-        return descricaoVaga;
-    }
+    public Voluntario getVoluntario() { return voluntario; }
+    public void setVoluntario(Voluntario voluntario) { this.voluntario = voluntario; }
 
-    public String getArea() {
-        return area;
-    }
-
-    public String getVagaAbrt() {
-        return vagaAbrt;
-    }
-
-    public String getVlt() {
-        return vlt;
-    }
-
-    public Voluntario getVoluntario() {
-        return voluntario;
-    }
-
-    //Setters
-    public void setDescricaoVaga(String descricaoVaga) {
-        this.descricaoVaga = descricaoVaga;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
-    }
-
-    public void setVagaAbrt(String vagaAbrt) {
-        this.vagaAbrt = vagaAbrt;
-    }
-
-    public void setVlt(String vlt) {
-        this.vlt = vlt;
-    }
-
-    public void setVoluntario(Voluntario voluntario) {
-        this.voluntario = voluntario;
-    }
+    public LocalDate getDataCandidatura() { return dataCandidatura; }
+    public void setDataCandidatura(LocalDate dataCandidatura) { this.dataCandidatura = dataCandidatura; }
 }

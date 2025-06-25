@@ -1,138 +1,59 @@
 package com.example.voluntariadointeligentehub.services;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.example.voluntariadointeligentehub.entities.VagaInstituicao;
+import com.example.voluntariadointeligentehub.entities.VagasVoluntarias;
+import com.example.voluntariadointeligentehub.entities.Voluntario;
+import com.example.voluntariadointeligentehub.repositories.VagaInstituicaoRepository;
+import com.example.voluntariadointeligentehub.repositories.VagasVoluntariasRepository;
+import com.example.voluntariadointeligentehub.repositories.VoluntarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.voluntariadointeligentehub.entities.VagasVoluntarias;
-import com.example.voluntariadointeligentehub.repositories.VagasVoluntariasRepository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VagasVoluntariasService {
-    
+
     @Autowired
-    private VagasVoluntariasRepository vagasVoluntariasRepository;
+    private VagasVoluntariasRepository repository;
+
+    @Autowired
+    private VagaInstituicaoRepository vagaRepo;
+
+    @Autowired
+    private VoluntarioRepository voluntarioRepo;
 
     @Transactional
-    public ResponseEntity<List<VagasVoluntarias>> findAll() {
-        try {
-            List<VagasVoluntarias> resultado = vagasVoluntariasRepository.findAll();
+    public ResponseEntity<?> candidatar(VagasVoluntarias candidatura) {
+        VagaInstituicao vaga = vagaRepo.findById(candidatura.getVaga().getId()).orElse(null);
+        Voluntario voluntario = voluntarioRepo.findById(candidatura.getVoluntario().getId()).orElse(null);
 
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println("Erro ao buscar vagas voluntarias: " + e.getMessage());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar os VagasVoluntariass.");
+        if (vaga == null || voluntario == null) {
+            return ResponseEntity.badRequest().body("Voluntário ou vaga inválida.");
         }
+
+        candidatura.setVaga(vaga);
+        candidatura.setVoluntario(voluntario);
+        candidatura.setDataCandidatura(LocalDate.now());
+
+        repository.save(candidatura);
+        return ResponseEntity.ok("Candidatura registrada com sucesso.");
     }
 
-    @Transactional
-    public ResponseEntity<Optional<VagasVoluntarias>> findById(Long id) {
-        try {
-            Optional<VagasVoluntarias> resultado = vagasVoluntariasRepository.findById(id);
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar VagasVoluntarias por id: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar vagas voluntarias por id");
-        }
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> getTodasVagasDisponiveis() {
+        List<VagaInstituicao> vagas = vagaRepo.findAll();
+        return ResponseEntity.ok(vagas);
     }
 
-    @Transactional
-    public ResponseEntity<Optional<VagasVoluntarias>> findByDescricaoVaga(String descricaoVaga) {
-        try {
-            Optional<VagasVoluntarias> resultado = vagasVoluntariasRepository.findByDescricaoVaga(descricaoVaga);
-
-            return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-                    ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar VagasVoluntarias por nome: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar VagasVoluntarias por nome");
-        }
-    }
-
-    @Transactional
-    public ResponseEntity<Optional<VagasVoluntarias>> findByArea(String area) {
-        try {
-            Optional<VagasVoluntarias> resultado = vagasVoluntariasRepository.findByArea(area);
-
-            return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-                    ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar VagasVoluntarias por email: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar VagasVoluntarias por email");
-        }
-    }
-
-
-    @Transactional
-    public ResponseEntity<Optional<VagasVoluntarias>> findByVagaAbrt(String vagaAbrt) {
-        try {
-            Optional<VagasVoluntarias> resultado = vagasVoluntariasRepository.findByVagaAbrt(vagaAbrt);
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar VagasVoluntarias por senha: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar VagasVoluntarias por senha");
-        }
-    }
-
-    @Transactional
-    public VagasVoluntarias create(VagasVoluntarias vagasVoluntarias) {
-        try {
-            return vagasVoluntariasRepository.save(vagasVoluntarias);
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao criar VagasVoluntarias: " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public Optional<VagasVoluntarias> update(Long id, VagasVoluntarias VagasVoluntariasDetails) {
-        try {
-            Optional<VagasVoluntarias> existingVagasVoluntarias = vagasVoluntariasRepository.findById(id);
-            if (existingVagasVoluntarias.isPresent()) {
-                VagasVoluntarias VagasVoluntarias = existingVagasVoluntarias.get();
-                VagasVoluntarias.setArea(VagasVoluntariasDetails.getArea());
-                VagasVoluntarias.setVagaAbrt(VagasVoluntariasDetails.getVagaAbrt());
-                VagasVoluntarias.setVlt(VagasVoluntariasDetails.getVlt());
-                return Optional.of(vagasVoluntariasRepository.save(VagasVoluntarias));
-            } else {
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao atualizar VagasVoluntarias: " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public boolean delete(Long id) {
-        try {
-            Optional<VagasVoluntarias> existingVagasVoluntarias = vagasVoluntariasRepository.findById(id);
-            if (existingVagasVoluntarias.isPresent()) {
-                vagasVoluntariasRepository.deleteById(id);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao deletar VagasVoluntarias: " + e.getMessage());
-        }
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> getVagasPorVoluntario(Long voluntarioId) {
+        List<VagasVoluntarias> candidaturas = repository.findByVoluntarioId(voluntarioId);
+        List<VagaInstituicao> vagas = candidaturas.stream().map(VagasVoluntarias::getVaga).collect(Collectors.toList());
+        return ResponseEntity.ok(vagas);
     }
 }

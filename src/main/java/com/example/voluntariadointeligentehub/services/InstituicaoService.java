@@ -1,8 +1,9 @@
 package com.example.voluntariadointeligentehub.services;
 
-import java.util.List;
-import java.util.Optional;
+import java.security.Key;
+import java.util.*;
 
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,94 +13,47 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.voluntariadointeligentehub.entities.Instituicao;
 import com.example.voluntariadointeligentehub.repositories.InstituicaoRepository;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
 @Service
 public class InstituicaoService {
 
     @Autowired
     private InstituicaoRepository instituicaoRepository;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    private final Key jwtKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private final long jwtExpirationMs = 86400000; // 24h
 
     @Transactional
     public ResponseEntity<List<Instituicao>> findAll() {
-        try {
-            List<Instituicao> resultado = instituicaoRepository.findAll();
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println("Erro ao buscar vagas voluntarias: " + e.getMessage());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar os Instituicaos.");
-        }
+        return ResponseEntity.ok(instituicaoRepository.findAll());
     }
 
     @Transactional
     public ResponseEntity<Optional<Instituicao>> findById(Long id) {
-        try {
-            Optional<Instituicao> resultado = instituicaoRepository.findById(id);
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar Instituicao por id: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar vagas voluntarias por id");
-        }
+        return ResponseEntity.ok(instituicaoRepository.findById(id));
     }
 
     @Transactional
     public ResponseEntity<Optional<Instituicao>> findByNome(String nome) {
-        try {
-            Optional<Instituicao> resultado = instituicaoRepository.findByNome(nome);
-
-            return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-                    ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar instituicao por nome: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar instituicao por nome");
-        }
+        Optional<Instituicao> resultado = instituicaoRepository.findByNome(nome);
+        return resultado.isPresent() ? ResponseEntity.ok(resultado) : ResponseEntity.notFound().build();
     }
 
     @Transactional
     public ResponseEntity<Optional<Instituicao>> findByEmail(String email) {
-        try {
-            Optional<Instituicao> resultado = instituicaoRepository.findByEmail(email);
-
-            return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-                    ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar instituicao por email: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar instituicao por email");
-        }
+        Optional<Instituicao> resultado = instituicaoRepository.findByEmail(email);
+        return resultado.isPresent() ? ResponseEntity.ok(resultado) : ResponseEntity.notFound().build();
     }
 
-
     @Transactional
-    public ResponseEntity<Optional<Instituicao>> findByPassword(String password) {
+    public Instituicao create(Instituicao instituicao) {
         try {
-            Optional<Instituicao> resultado = instituicaoRepository.findByPassword(password);
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar instituicao por senha: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar instituicao por senha");
-        }
-    }
-    @Transactional
-    public Instituicao create(Instituicao Instituicao) {
-        try {
-            return instituicaoRepository.save(Instituicao);
+            instituicao.setPassword(passwordEncoder.encode(instituicao.getPassword()));
+            return instituicaoRepository.save(instituicao);
         } catch (Exception e) {
             throw new RuntimeException("Erro ao criar Instituicao: " + e.getMessage());
         }
@@ -107,86 +61,67 @@ public class InstituicaoService {
 
     @Transactional
     public Optional<Instituicao> update(Long id, Instituicao instituicaoDetails) {
-        try {
-            Optional<Instituicao> existingInstituicao = instituicaoRepository.findById(id);
-            if (existingInstituicao.isPresent()) {
-                Instituicao instituicao = existingInstituicao.get();
-                instituicao.setCnpj(instituicaoDetails.getCnpj());
-                instituicao.setEmail(instituicaoDetails.getEmail());
-                instituicao.setPassword(instituicaoDetails.getPassword());
-                instituicao.setDescription(instituicaoDetails.getDescription());
-                instituicao.setVgaAbrtInstru(instituicaoDetails.getVgaAbrtInstru());
-                instituicao.setAvaliacao(instituicaoDetails.getAvaliacao());
-                instituicao.setNome(instituicaoDetails.getNome());
-                instituicao.setMensagemInstituicao(instituicaoDetails.getMensagemInstituicao());
-                instituicao.setAreaInstituicao(instituicaoDetails.getAreaInstituicao());
-                instituicao.setRltIntituicao(instituicaoDetails.getRltIntituicao());
-                instituicao.setDescricaoInstituicao(instituicaoDetails.getDescricaoInstituicao());
-                return Optional.of(instituicaoRepository.save(instituicao));
-            } else {
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao atualizar Perfil Instituicao: " + e.getMessage());
+        Optional<Instituicao> existing = instituicaoRepository.findById(id);
+        if (existing.isPresent()) {
+            Instituicao instituicao = existing.get();
+            instituicao.setCnpj(instituicaoDetails.getCnpj());
+            instituicao.setEmail(instituicaoDetails.getEmail());
+            instituicao.setPassword(passwordEncoder.encode(instituicaoDetails.getPassword()));
+            instituicao.setNome(instituicaoDetails.getNome());
+            return Optional.of(instituicaoRepository.save(instituicao));
         }
+        return Optional.empty();
     }
 
     @Transactional
     public boolean delete(Long id) {
-        try {
-            Optional<Instituicao> existingInstituicao = instituicaoRepository.findById(id);
-            if (existingInstituicao.isPresent()) {
-                instituicaoRepository.deleteById(id);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao deletar Instituicao: " + e.getMessage());
+        Optional<Instituicao> existente = instituicaoRepository.findById(id);
+        if (existente.isPresent()) {
+            instituicaoRepository.deleteById(id);
+            return true;
         }
+        return false;
     }
 
     @Transactional
-    public ResponseEntity<String> register(String nome, String email, String cnpj, String areaInstituicao,  String password, String descricao) {
-        try {
-            Optional<Instituicao> existingInstituicao = instituicaoRepository.findByEmail(email);
-            if (existingInstituicao.isPresent()) {
-                return ResponseEntity.badRequest().body("E-mail já registrado.");
+    public String login(String email, String password) {
+        Optional<Instituicao> instituicaoOpt = instituicaoRepository.findByEmail(email);
+        if (instituicaoOpt.isPresent()) {
+            Instituicao instituicao = instituicaoOpt.get();
+            if (passwordEncoder.matches(password, instituicao.getPassword())) {
+                return gerarJwtToken(instituicao); // retorna o token como string
             }
-            Instituicao instituicao = new Instituicao();
-            instituicao.setNome(nome);
-            instituicao.setEmail(email);
-            instituicao.setCnpj(cnpj);
-            instituicao.setAreaInstituicao(areaInstituicao);
-            instituicao.setPassword(password);
-            instituicao.setDescription(descricao);
+            throw new RuntimeException("Senha incorreta.");
+        }
+        throw new RuntimeException("Usuário não encontrado.");
+    }
 
-            instituicao.setPassword(passwordEncoder.encode(password));
 
+    @Transactional
+    public ResponseEntity<Map<String, String>> register(Instituicao instituicao) {
+        Optional<Instituicao> existente = instituicaoRepository.findByEmail(instituicao.getEmail());
+        if (existente.isPresent()) {
+            return ResponseEntity.badRequest()
+                    .body(Collections.singletonMap("message", "E-mail já registrado."));
+        }
+
+        try {
+            instituicao.setPassword(passwordEncoder.encode(instituicao.getPassword()));
             instituicaoRepository.save(instituicao);
-            return ResponseEntity.ok("Usuário registrado com sucesso!");
+            return ResponseEntity.ok(Collections.singletonMap("message", "Usuário registrado com sucesso!"));
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao registrar usuário: " + e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body(Collections.singletonMap("message", "Erro ao registrar: " + e.getMessage()));
         }
     }
 
-    @Transactional
-    public ResponseEntity<String> login(String email, String password) {
-        try {
-            Optional<Instituicao> instituicaoOpt = instituicaoRepository.findByEmail(email);
-            if (instituicaoOpt.isPresent()) {
-                Instituicao instituicao = instituicaoOpt.get();
-
-                if (passwordEncoder.matches(password, instituicao.getPassword())) {
-                    return ResponseEntity.ok("Login bem-sucedido!");
-                } else {
-                    return ResponseEntity.badRequest().body("Senha incorreta.");
-                }
-            } else {
-                return ResponseEntity.badRequest().body("Usuário não encontrado.");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao realizar login: " + e.getMessage());
-        }
+    private String gerarJwtToken(Instituicao instituicao) {
+        return Jwts.builder()
+                .setSubject(instituicao.getEmail())
+                .claim("nome", instituicao.getNome())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(jwtKey, SignatureAlgorithm.HS512)
+                .compact();
     }
 }

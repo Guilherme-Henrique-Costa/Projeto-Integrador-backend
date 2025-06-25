@@ -1,182 +1,99 @@
+// Voluntario.java
 package com.example.voluntariadointeligentehub.entities;
 
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_voluntario")
 public class Voluntario implements Serializable {
 
-    private static final long serialVersionUID = 5935836358441880615L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 80)
+    private String matricula;
     private String nome;
+    private String cpf;
+    private LocalDate dataNascimento;
+    private String genero;
+    private String senha;
 
-    @Column(length = 60)
-    private String email;
+    @ElementCollection
+    private List<String> atividadeCEUB;
 
-    @Column(length = 20)
-    private String password;
+    private String emailInstitucional;
+    private String emailParticular;
+    private String celular;
+    private String cidadeUF;
+    private String horario;
+    private String motivacao;
 
-    private String interesse;
+    @ElementCollection
+    private List<String> causas;
 
-    private String competence;
+    @ElementCollection
+    private List<String> habilidades;
 
-    @Column(length = 240)
-    private String fdbk;
+    @ElementCollection
+    private List<String> disponibilidadeSemanal;
 
-    @Column(name = "nascimento")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private LocalDate nascimento;
+    private String comentarios;
 
-    private String descricaoVaga;
+    // Getters e Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "voluntario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MensagemVoluntaria> mensagens;
+    public String getMatricula() { return matricula; }
+    public void setMatricula(String matricula) { this.matricula = matricula; }
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "voluntario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<VagasVoluntarias> vagasVoluntarias;
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "voluntario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<FeedbackVoluntario> feedbackVoluntarias;
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "voluntario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Instituicao> instituicao;
+    public LocalDate getDataNascimento() { return dataNascimento; }
+    public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
 
-    public Voluntario() {
+    public String getGenero() { return genero; }
+    public void setGenero(String genero) { this.genero = genero; }
 
-    }
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
 
-    public Voluntario(
-            String nome,
-            String email,
-            String password,
-            String interesse,
-            String competence,
-            LocalDate nascimento,
-            String descricaoVaga,
-            String fdbk
-    ) {
-        this.nome = nome;
-        this.email = email;
-        this.password = password;
-        this.interesse = interesse;
-        this.competence = competence;
-        this.nascimento = nascimento;
-        this.descricaoVaga = descricaoVaga;
-        this.fdbk = fdbk;
-    }
+    public List<String> getAtividadeCEUB() { return atividadeCEUB; }
+    public void setAtividadeCEUB(List<String> atividadeCEUB) { this.atividadeCEUB = atividadeCEUB; }
 
-    //Getters
-    public Long getId() {
-        return id;
-    }
+    public String getEmailInstitucional() { return emailInstitucional; }
+    public void setEmailInstitucional(String emailInstitucional) { this.emailInstitucional = emailInstitucional; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getEmailParticular() { return emailParticular; }
+    public void setEmailParticular(String emailParticular) { this.emailParticular = emailParticular; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getCelular() { return celular; }
+    public void setCelular(String celular) { this.celular = celular; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getCidadeUF() { return cidadeUF; }
+    public void setCidadeUF(String cidadeUF) { this.cidadeUF = cidadeUF; }
 
-    public String getInteresse() {
-        return interesse;
-    }
+    public String getHorario() { return horario; }
+    public void setHorario(String horario) { this.horario = horario; }
 
-    public String getCompetence() {
-        return competence;
-    }
+    public String getMotivacao() { return motivacao; }
+    public void setMotivacao(String motivacao) { this.motivacao = motivacao; }
 
-    public LocalDate getNascimento() {
-        return nascimento;
-    }
+    public List<String> getCausas() { return causas; }
+    public void setCausas(List<String> causas) { this.causas = causas; }
 
-    public String getDescricaoVaga() {
-        return descricaoVaga;
-    }
+    public List<String> getHabilidades() { return habilidades; }
+    public void setHabilidades(List<String> habilidades) { this.habilidades = habilidades; }
 
-    public String getFdbk() {
-        return fdbk;
-    }
+    public List<String> getDisponibilidadeSemanal() { return disponibilidadeSemanal; }
+    public void setDisponibilidadeSemanal(List<String> disponibilidadeSemanal) { this.disponibilidadeSemanal = disponibilidadeSemanal; }
 
-    public List<MensagemVoluntaria> getMensagens() {
-        return mensagens;
-    }
-
-    public List<VagasVoluntarias> getVagasVoluntarias() {
-        return vagasVoluntarias;
-    }
-
-    public List<FeedbackVoluntario> getFeedbackVoluntarias() {
-        return feedbackVoluntarias;
-    }
-
-    public List<Instituicao> getInstituicao() {
-        return instituicao;
-    }
-
-    //Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setInteresse(String interesse) {
-        this.interesse = interesse;
-    }
-
-    public void setCompetence(String competence) {
-        this.competence = competence;
-    }
-
-    public void setNascimento(LocalDate nascimento) {
-        this.nascimento = nascimento;
-    }
-
-    public void setDescricaoVaga(String descricaoVaga) {
-        this.descricaoVaga = descricaoVaga;
-    }
-
-    public void setFdbk(String fdbk) {
-        this.fdbk = fdbk;
-    }
+    public String getComentarios() { return comentarios; }
+    public void setComentarios(String comentarios) { this.comentarios = comentarios; }
 }

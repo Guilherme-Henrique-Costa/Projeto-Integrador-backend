@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: db-voluntariado
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: voluntariado_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: suporte123@
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-voluntariado
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ceub.br
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  pgdata:
+  pgadmin_data:

@@ -1,13 +1,10 @@
 package com.example.voluntariadointeligentehub.repositories;
 
-import java.util.Optional;
-
+import com.example.voluntariadointeligentehub.entities.VagasVoluntarias;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.voluntariadointeligentehub.entities.VagasVoluntarias;
+import java.util.List;
 
-public interface  VagasVoluntariasRepository extends JpaRepository<VagasVoluntarias, Long> {
-    Optional<VagasVoluntarias> findByDescricaoVaga(String descricaoVaga);
-    Optional<VagasVoluntarias> findByArea(String area);
-    Optional<VagasVoluntarias> findByVagaAbrt(String vagaAbrt);
+public interface VagasVoluntariasRepository extends JpaRepository<VagasVoluntarias, Long> {
+    List<VagasVoluntarias> findByVoluntarioId(Long voluntarioId);
 }

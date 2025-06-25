@@ -1,15 +1,9 @@
 package com.example.voluntariadointeligentehub.entities;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "tb_instituicao")
@@ -18,217 +12,141 @@ public class Instituicao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "CNPJ é obrigatório")
     private String cnpj;
 
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Email deve ser válido")
     @Column(length = 60)
     private String email;
 
-    @Column(length = 20)
+    @NotBlank(message = "Senha é obrigatória")
+    @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
+    @Column(length = 60)
     private String password;
-    
-    @Column(length = 240)
-    private String description;
 
-    private int vgaAbrtInstru;
-
-    @Column(length = 5)
-    private String avaliacao;
-
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
-    private String mensagemInstituicao;
-
-    private String areaInstituicao;
-
-    private int rltIntituicao;
-
-    private int vltInstituicao;
-
-    @Column(length = 150)
-    private String competence;
-
-    private String nomeVltInstituicao;
-
-    private String descricaoInstituicao;
-
     private String interestArea;
+    private String telefoneContato;
+    private String endereco;
+    private String areaAtuacao;
+    private String causasApoio;
+    private String habilidadesRequeridas;
+    private String responsavelPreenchimento;
+    private String nomeContatoVoluntariado;
+    private String funcaoContatoVoluntariado;
+    private String telefoneContatoVoluntariado;
+    private String semFinsLucrativos;
+    private String constituidaFormalmente;
+    private String emAtividade;
+    private String sedeDesvinculada;
+    private String prestadoraServicos;
+    private String interesseRH;
+    private String prestarInfosCEUB;
+    private String avaliadaCEUB;
+    private String motivoInteresseVoluntarios;
+    private String enderecoTrabalhoVoluntario;
+    private String horasMensaisVoluntario;
+    private String contatosRepassadosVoluntarios;
+    private String comentariosSugestoes;
 
     @OneToOne(mappedBy = "instituicao", cascade = CascadeType.ALL)
     private PerfilInstituicao perfilInstituicao;
 
     @ManyToOne
-    @JoinColumn(name = "voluntario_id", nullable = false)
+    @JoinColumn(name = "voluntario_id", nullable = true)
     private Voluntario voluntario;
 
-    public Instituicao() {
+    // Getters e Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    }
+    public String getCnpj() { return cnpj; }
+    public void setCnpj(String cnpj) { this.cnpj = cnpj; }
 
-    public Instituicao(
-        Long id,
-        String cnpj,
-        String email,
-        String password,
-        String description,
-        int vgaAbrtInstru,
-        String avaliacao,
-        String nome,
-        String mensagemInstituicao,
-        String areaInstituicao,
-        int rltIntituicao,
-        int vltInstituicao,
-        String competence,
-        String nomeVltInstituicao,
-        String descricaoInstituicao,
-        Voluntario voluntario
-        ) {
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-        this.id = id;
-        this.cnpj = cnpj;
-        this.email = email;
-        this.password = password;
-        this.description = description;
-        this.vgaAbrtInstru = vgaAbrtInstru;
-        this.avaliacao = avaliacao;
-        this.nome = nome;
-        this.mensagemInstituicao = mensagemInstituicao;
-        this.areaInstituicao = areaInstituicao;
-        this.rltIntituicao = rltIntituicao;
-        this.vltInstituicao = vltInstituicao;
-        this.competence = competence;
-        this.nomeVltInstituicao = nomeVltInstituicao;
-        this.descricaoInstituicao = descricaoInstituicao;
-        this.voluntario = voluntario;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    //Getters
-    public Long getId() {
-        return id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getCnpj() {
-        return cnpj;
-    }
+    public String getInterestArea() { return interestArea; }
+    public void setInterestArea(String interestArea) { this.interestArea = interestArea; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getTelefoneContato() { return telefoneContato; }
+    public void setTelefoneContato(String telefoneContato) { this.telefoneContato = telefoneContato; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getEndereco() { return endereco; }
+    public void setEndereco(String endereco) { this.endereco = endereco; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getAreaAtuacao() { return areaAtuacao; }
+    public void setAreaAtuacao(String areaAtuacao) { this.areaAtuacao = areaAtuacao; }
 
-    public int getVgaAbrtInstru() {
-        return vgaAbrtInstru;
-    }
+    public String getCausasApoio() { return causasApoio; }
+    public void setCausasApoio(String causasApoio) { this.causasApoio = causasApoio; }
 
-    public String getAvaliacao() {
-        return avaliacao;
-    }
+    public String getHabilidadesRequeridas() { return habilidadesRequeridas; }
+    public void setHabilidadesRequeridas(String habilidadesRequeridas) { this.habilidadesRequeridas = habilidadesRequeridas; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getResponsavelPreenchimento() { return responsavelPreenchimento; }
+    public void setResponsavelPreenchimento(String responsavelPreenchimento) { this.responsavelPreenchimento = responsavelPreenchimento; }
 
-    public String getMensagemInstituicao() {
-        return mensagemInstituicao;
-    }
+    public String getNomeContatoVoluntariado() { return nomeContatoVoluntariado; }
+    public void setNomeContatoVoluntariado(String nomeContatoVoluntariado) { this.nomeContatoVoluntariado = nomeContatoVoluntariado; }
 
-    public String getAreaInstituicao() {
-        return areaInstituicao;
-    }
+    public String getFuncaoContatoVoluntariado() { return funcaoContatoVoluntariado; }
+    public void setFuncaoContatoVoluntariado(String funcaoContatoVoluntariado) { this.funcaoContatoVoluntariado = funcaoContatoVoluntariado; }
 
-    public int getRltIntituicao() {
-        return rltIntituicao;
-    }
+    public String getTelefoneContatoVoluntariado() { return telefoneContatoVoluntariado; }
+    public void setTelefoneContatoVoluntariado(String telefoneContatoVoluntariado) { this.telefoneContatoVoluntariado = telefoneContatoVoluntariado; }
 
-    public int getVltInstituicao() {
-        return vltInstituicao;
-    }
+    public String getSemFinsLucrativos() { return semFinsLucrativos; }
+    public void setSemFinsLucrativos(String semFinsLucrativos) { this.semFinsLucrativos = semFinsLucrativos; }
 
-    public String getCompetence() {
-        return competence;
-    }
+    public String getConstituidaFormalmente() { return constituidaFormalmente; }
+    public void setConstituidaFormalmente(String constituidaFormalmente) { this.constituidaFormalmente = constituidaFormalmente; }
 
-    public String getNomeVltInstituicao() {
-        return nomeVltInstituicao;
-    }
+    public String getEmAtividade() { return emAtividade; }
+    public void setEmAtividade(String emAtividade) { this.emAtividade = emAtividade; }
 
-    public String getDescricaoInstituicao() {
-        return descricaoInstituicao;
-    }
+    public String getSedeDesvinculada() { return sedeDesvinculada; }
+    public void setSedeDesvinculada(String sedeDesvinculada) { this.sedeDesvinculada = sedeDesvinculada; }
 
-    public PerfilInstituicao getPerfilInstituicao() {
-        return perfilInstituicao;
-    }
+    public String getPrestadoraServicos() { return prestadoraServicos; }
+    public void setPrestadoraServicos(String prestadoraServicos) { this.prestadoraServicos = prestadoraServicos; }
 
-    public Voluntario getVoluntario() {
-        return voluntario;
-    }
+    public String getInteresseRH() { return interesseRH; }
+    public void setInteresseRH(String interesseRH) { this.interesseRH = interesseRH; }
 
+    public String getPrestarInfosCEUB() { return prestarInfosCEUB; }
+    public void setPrestarInfosCEUB(String prestarInfosCEUB) { this.prestarInfosCEUB = prestarInfosCEUB; }
 
-    //Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getAvaliadaCEUB() { return avaliadaCEUB; }
+    public void setAvaliadaCEUB(String avaliadaCEUB) { this.avaliadaCEUB = avaliadaCEUB; }
 
-    public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
-    }
+    public String getMotivoInteresseVoluntarios() { return motivoInteresseVoluntarios; }
+    public void setMotivoInteresseVoluntarios(String motivoInteresseVoluntarios) { this.motivoInteresseVoluntarios = motivoInteresseVoluntarios; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getEnderecoTrabalhoVoluntario() { return enderecoTrabalhoVoluntario; }
+    public void setEnderecoTrabalhoVoluntario(String enderecoTrabalhoVoluntario) { this.enderecoTrabalhoVoluntario = enderecoTrabalhoVoluntario; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getHorasMensaisVoluntario() { return horasMensaisVoluntario; }
+    public void setHorasMensaisVoluntario(String horasMensaisVoluntario) { this.horasMensaisVoluntario = horasMensaisVoluntario; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getContatosRepassadosVoluntarios() { return contatosRepassadosVoluntarios; }
+    public void setContatosRepassadosVoluntarios(String contatosRepassadosVoluntarios) { this.contatosRepassadosVoluntarios = contatosRepassadosVoluntarios; }
 
-    public void setVgaAbrtInstru(int vgaAbrtInstru){
-        this.vgaAbrtInstru = vgaAbrtInstru;
-    }
+    public String getComentariosSugestoes() { return comentariosSugestoes; }
+    public void setComentariosSugestoes(String comentariosSugestoes) { this.comentariosSugestoes = comentariosSugestoes; }
 
-    public void setAvaliacao(String avaliacao){
-        this.avaliacao = avaliacao;
-    }
+    public PerfilInstituicao getPerfilInstituicao() { return perfilInstituicao; }
+    public void setPerfilInstituicao(PerfilInstituicao perfilInstituicao) { this.perfilInstituicao = perfilInstituicao; }
 
-    public void setNome(String nome){
-        this.nome = nome;
-    }
-
-    public void setMensagemInstituicao(String mensagemInstituicao){
-        this.mensagemInstituicao = mensagemInstituicao;
-    }
-
-    public void setAreaInstituicao(String areaInstituicao){
-        this.areaInstituicao = areaInstituicao;
-    }
-
-    public void setRltIntituicao(int rltIntituicao){
-        this.rltIntituicao = rltIntituicao;
-    }
-
-    public void setVltInstituicao(int vltInstituicao) {
-        this.vltInstituicao = vltInstituicao;
-    }
-
-    public void setCompetence(String competence) {
-        this.competence = competence;
-    }
-
-    public void setDescricaoInstituicao(String descricaoInstituicao){
-        this.descricaoInstituicao = descricaoInstituicao;
-    }
-
-    public void setVoluntario(Voluntario voluntario) {
-        this.voluntario = voluntario;
-    }
+    public Voluntario getVoluntario() { return voluntario; }
+    public void setVoluntario(Voluntario voluntario) { this.voluntario = voluntario; }
 }

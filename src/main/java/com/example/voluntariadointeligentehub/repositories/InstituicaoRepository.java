@@ -9,5 +9,4 @@ import com.example.voluntariadointeligentehub.entities.Instituicao;
 public interface InstituicaoRepository extends JpaRepository<Instituicao, Long>{
     Optional<Instituicao> findByNome(String nome);
     Optional<Instituicao> findByEmail(String email);
-    Optional<Instituicao> findByPassword(String password);
 }
