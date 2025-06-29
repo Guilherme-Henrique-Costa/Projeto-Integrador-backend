@@ -1,9 +1,9 @@
 package com.example.voluntariadointeligentehub.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.example.voluntariadointeligentehub.entities.MensagemVoluntaria;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-public interface MensagemVoluntariaRepository extends JpaRepository<MensagemVoluntaria, Long>{
-    
+public interface MensagemVoluntariaRepository extends JpaRepository<MensagemVoluntaria, Long> {
+    List<MensagemVoluntaria> findByVoluntario_IdOrderByDataHoraAsc(Long id);
 }

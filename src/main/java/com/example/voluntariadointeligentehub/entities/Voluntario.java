@@ -1,6 +1,7 @@
 // Voluntario.java
 package com.example.voluntariadointeligentehub.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -41,6 +42,15 @@ public class Voluntario implements Serializable {
     private List<String> disponibilidadeSemanal;
 
     private String comentarios;
+    private String avatarPath;
+
+    @ManyToOne
+    @JoinColumn(name = "instituicao_id")
+    private Instituicao instituicao;
+
+    @OneToMany(mappedBy = "voluntario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("voluntario-vaga")
+    private List<VagasVoluntarias> vagas;
 
     // Getters e Setters
     public Long getId() { return id; }
@@ -96,4 +106,19 @@ public class Voluntario implements Serializable {
 
     public String getComentarios() { return comentarios; }
     public void setComentarios(String comentarios) { this.comentarios = comentarios; }
+
+    public String getAvatarPath() { return avatarPath; }
+    public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath; }
+
+    public List<VagasVoluntarias> getVagas() { return vagas; }
+    public void setVagas(List<VagasVoluntarias> vagas) { this.vagas = vagas; }
+
+    public Instituicao getInstituicao() {
+        return instituicao;
+    }
+
+    public void setInstituicao(Instituicao instituicao) {
+        this.instituicao = instituicao;
+    }
+
 }

@@ -59,7 +59,9 @@ public class VoluntarioService {
             v.setCpf(data.getCpf());
             v.setDataNascimento(data.getDataNascimento());
             v.setGenero(data.getGenero());
-            v.setSenha(encoder.encode(data.getSenha()));
+            v.setSenha(data.getSenha() != null && !data.getSenha().isBlank()
+                    ? encoder.encode(data.getSenha())
+                    : v.getSenha());
             v.setAtividadeCEUB(data.getAtividadeCEUB());
             v.setEmailInstitucional(data.getEmailInstitucional());
             v.setEmailParticular(data.getEmailParticular());
@@ -71,6 +73,7 @@ public class VoluntarioService {
             v.setHabilidades(data.getHabilidades());
             v.setDisponibilidadeSemanal(data.getDisponibilidadeSemanal());
             v.setComentarios(data.getComentarios());
+            v.setAvatarPath(data.getAvatarPath());
             return voluntarioRepository.save(v);
         });
     }

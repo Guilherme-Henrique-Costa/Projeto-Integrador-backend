@@ -1,5 +1,6 @@
 package com.example.voluntariadointeligentehub.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -13,10 +14,12 @@ public class VagasVoluntarias {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vaga_id", nullable = false)
+    @JsonBackReference("vaga-voluntaria")
     private VagaInstituicao vaga;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voluntario_id", nullable = false)
+    @JsonBackReference("voluntario-vaga")
     private Voluntario voluntario;
 
     private LocalDate dataCandidatura;

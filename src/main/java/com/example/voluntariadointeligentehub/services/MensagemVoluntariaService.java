@@ -1,15 +1,15 @@
 package com.example.voluntariadointeligentehub.services;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.example.voluntariadointeligentehub.dto.ConversaDTO;
+import com.example.voluntariadointeligentehub.entities.MensagemVoluntaria;
+import com.example.voluntariadointeligentehub.repositories.MensagemVoluntariaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.voluntariadointeligentehub.entities.MensagemVoluntaria;
-import com.example.voluntariadointeligentehub.repositories.MensagemVoluntariaRepository;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MensagemVoluntariaService {
@@ -18,110 +18,35 @@ public class MensagemVoluntariaService {
     private MensagemVoluntariaRepository mensagemVoluntariaRepository;
 
     @Transactional
-    public ResponseEntity<List<MensagemVoluntaria>> findAll() {
-        try {
-            List<MensagemVoluntaria> resultado = mensagemVoluntariaRepository.findAll();
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println("Erro ao buscar vagas voluntarias: " + e.getMessage());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar os MensagemVoluntarias.");
-        }
+    public MensagemVoluntaria create(MensagemVoluntaria msg) {
+        msg.setDataHora(LocalDateTime.now());
+        return mensagemVoluntariaRepository.save(msg);
     }
 
-    @Transactional
-    public ResponseEntity<Optional<MensagemVoluntaria>> findById(Long id) {
-        try {
-            Optional<MensagemVoluntaria> resultado = mensagemVoluntariaRepository.findById(id);
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar MensagemVoluntaria por id: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar vagas voluntarias por id");
-        }
+    @Transactional(readOnly = true)
+    public List<MensagemVoluntaria> findByVoluntarioId(Long id) {
+        return mensagemVoluntariaRepository.findByVoluntario_IdOrderByDataHoraAsc(id);
     }
 
-    // @Transactional
-    // public ResponseEntity<Optional<MensagemVoluntaria>> findByDescricaoVaga(String descricaoVaga) {
-    //     try {
-    //         Optional<MensagemVoluntaria> resultado = mensagemVoluntariaRepository.findByDescricaoVaga(descricaoVaga);
-    //         return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-    //                 ResponseEntity.notFound().build();
-    //     } catch (Exception e) {
-    //         System.err.println(
-    //                 "Erro ao buscar MensagemVoluntaria por nome: " + e.getMessage() + e.getCause());
-    //         throw new RuntimeException(
-    //                 "Ocorreu um erro ao buscar MensagemVoluntaria por nome");
-    //     }
-    // }
-    // @Transactional
-    // public ResponseEntity<Optional<MensagemVoluntaria>> findByArea(String area) {
-    //     try {
-    //         Optional<MensagemVoluntaria> resultado = mensagemVoluntariaRepository.findByArea(area);
-    //         return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-    //                 ResponseEntity.notFound().build();
-    //     } catch (Exception e) {
-    //         System.err.println(
-    //                 "Erro ao buscar MensagemVoluntaria por email: " + e.getMessage() + e.getCause());
-    //         throw new RuntimeException(
-    //                 "Ocorreu um erro ao buscar MensagemVoluntaria por email");
-    //     }
-    // }
-    // @Transactional
-    // public ResponseEntity<Optional<MensagemVoluntaria>> findByVagaAbrt(String vagaAbrt) {
-    //     try {
-    //         Optional<MensagemVoluntaria> resultado = mensagemVoluntariaRepository.findByVagaAbrt(vagaAbrt);
-    //         return ResponseEntity.ok(resultado);
-    //     } catch (Exception e) {
-    //         System.err.println(
-    //                 "Erro ao buscar MensagemVoluntaria por senha: " + e.getMessage() + e.getCause());
-    //         throw new RuntimeException(
-    //                 "Ocorreu um erro ao buscar MensagemVoluntaria por senha");
-    //     }
-    // }
-    @Transactional
-    public MensagemVoluntaria create(MensagemVoluntaria MensagemVoluntaria) {
-        try {
-            return mensagemVoluntariaRepository.save(MensagemVoluntaria);
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao criar MensagemVoluntaria: " + e.getMessage());
-        }
-    }
+    @Transactional(readOnly = true)
+    public List<ConversaDTO> gerarConversasPorInstituicao(Long voluntarioId) {
+        List<MensagemVoluntaria> mensagens = findByVoluntarioId(voluntarioId);
 
-    @Transactional
-    public Optional<MensagemVoluntaria> update(Long id, MensagemVoluntaria mensagemVoluntariaDetails) {
-        try {
-            Optional<MensagemVoluntaria> existingMensagemVoluntaria = mensagemVoluntariaRepository.findById(id);
-            if (existingMensagemVoluntaria.isPresent()) {
-                MensagemVoluntaria mensagemVoluntaria = existingMensagemVoluntaria.get();
-                mensagemVoluntaria.setVoluntarioNome(mensagemVoluntariaDetails.getVoluntarioNome());
-                mensagemVoluntaria.setMensagemVoluntario(mensagemVoluntariaDetails.getMensagemVoluntario());
-                return Optional.of(mensagemVoluntariaRepository.save(mensagemVoluntaria));
-            } else {
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao atualizar Perfil Instituicao: " + e.getMessage());
-        }
-    }
+        Map<String, MensagemVoluntaria> ultimaPorInstituicao = mensagens.stream()
+                .collect(Collectors.toMap(
+                        m -> m.getVoluntario().getInstituicao().getNome(),
+                        m -> m,
+                        (m1, m2) -> m1.getDataHora().isAfter(m2.getDataHora()) ? m1 : m2
+                ));
 
-    @Transactional
-    public boolean delete(Long id) {
-        try {
-            Optional<MensagemVoluntaria> existingMensagemVoluntaria = mensagemVoluntariaRepository.findById(id);
-            if (existingMensagemVoluntaria.isPresent()) {
-                mensagemVoluntariaRepository.deleteById(id);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao deletar MensagemVoluntaria: " + e.getMessage());
-        }
+        return ultimaPorInstituicao.values().stream()
+                .map(m -> new ConversaDTO(
+                        m.getVoluntario().getInstituicao().getNome(),
+                        m.getMensagemVoluntario(),
+                        m.getDataHora(),
+                        true // ou lógica para determinar se foi lida
+                ))
+                .sorted(Comparator.comparing(ConversaDTO::getData).reversed())
+                .collect(Collectors.toList());
     }
 }

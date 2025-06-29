@@ -1,5 +1,6 @@
 package com.example.voluntariadointeligentehub.services;
 
+import com.example.voluntariadointeligentehub.dto.VagasVoluntariasDTO;
 import com.example.voluntariadointeligentehub.entities.VagaInstituicao;
 import com.example.voluntariadointeligentehub.entities.VagasVoluntarias;
 import com.example.voluntariadointeligentehub.entities.Voluntario;
@@ -51,9 +52,12 @@ public class VagasVoluntariasService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> getVagasPorVoluntario(Long voluntarioId) {
+    public ResponseEntity<List<VagasVoluntariasDTO>> getVagasPorVoluntario(Long voluntarioId) {
         List<VagasVoluntarias> candidaturas = repository.findByVoluntarioId(voluntarioId);
-        List<VagaInstituicao> vagas = candidaturas.stream().map(VagasVoluntarias::getVaga).collect(Collectors.toList());
-        return ResponseEntity.ok(vagas);
+        List<VagasVoluntariasDTO> dtos = candidaturas.stream()
+                .map(VagasVoluntariasDTO::fromEntity)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 }

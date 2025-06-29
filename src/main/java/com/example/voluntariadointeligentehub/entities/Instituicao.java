@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 @Entity
 @Table(name = "tb_instituicao")
 public class Instituicao {
@@ -55,9 +57,8 @@ public class Instituicao {
     @OneToOne(mappedBy = "instituicao", cascade = CascadeType.ALL)
     private PerfilInstituicao perfilInstituicao;
 
-    @ManyToOne
-    @JoinColumn(name = "voluntario_id", nullable = true)
-    private Voluntario voluntario;
+    @OneToMany(mappedBy = "instituicao")
+    private List<Voluntario> voluntarios;
 
     // Getters e Setters
     public Long getId() { return id; }
@@ -147,6 +148,11 @@ public class Instituicao {
     public PerfilInstituicao getPerfilInstituicao() { return perfilInstituicao; }
     public void setPerfilInstituicao(PerfilInstituicao perfilInstituicao) { this.perfilInstituicao = perfilInstituicao; }
 
-    public Voluntario getVoluntario() { return voluntario; }
-    public void setVoluntario(Voluntario voluntario) { this.voluntario = voluntario; }
+    public List<Voluntario> getVoluntarios() {
+        return voluntarios;
+    }
+
+    public void setVoluntarios(List<Voluntario> voluntarios) {
+        this.voluntarios = voluntarios;
+    }
 }

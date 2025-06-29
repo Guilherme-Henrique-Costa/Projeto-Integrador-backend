@@ -3,6 +3,7 @@ package com.example.voluntariadointeligentehub.services;
 import java.security.Key;
 import java.util.*;
 
+import com.example.voluntariadointeligentehub.entities.Voluntario;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -124,4 +125,12 @@ public class InstituicaoService {
                 .signWith(jwtKey, SignatureAlgorithm.HS512)
                 .compact();
     }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<Voluntario>> getVoluntariosDaInstituicao(Long id) {
+        Optional<Instituicao> instituicaoOpt = instituicaoRepository.findById(id);
+        return instituicaoOpt.map(instituicao -> ResponseEntity.ok(instituicao.getVoluntarios()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }

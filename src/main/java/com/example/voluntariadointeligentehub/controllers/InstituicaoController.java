@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.example.voluntariadointeligentehub.entities.Voluntario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,4 +79,8 @@ public class InstituicaoController {
         return ResponseEntity.ok(Collections.singletonMap("token", token));
     }
 
+    @GetMapping("/{id}/voluntarios")
+    public ResponseEntity<List<Voluntario>> getVoluntarios(@PathVariable Long id) {
+        return instituicaoService.getVoluntariosDaInstituicao(id);
+    }
 }

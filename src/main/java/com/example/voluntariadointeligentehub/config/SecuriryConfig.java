@@ -25,13 +25,16 @@ public class SecuriryConfig {
                                 "/api/v1/instituicao/**",
                                 "/api/v1/voluntario/login",
                                 "/api/v1/instituicao/login",
-                                "/api/v1/voluntario",
+                                "/api/v1/voluntario/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/api/vagasInstituicao",
                                 "/api/v1/instituicao",
-                                "/api/vagasDisponiveis",
-                                "/api/candidaturas"
+                                "/api/v1/vagasDisponiveis",
+                                "/api/v1/candidaturas",
+                                "/api/v1/vagasCandidatadas/**",
+                                "/api/v1/candidaturas/voluntario/**",
+                                "/api/v1/mensagem-voluntaria/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
