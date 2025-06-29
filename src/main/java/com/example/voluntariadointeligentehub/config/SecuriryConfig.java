@@ -25,6 +25,7 @@ public class SecuriryConfig {
                                 "/api/v1/instituicao/**",
                                 "/api/v1/voluntario/login",
                                 "/api/v1/instituicao/login",
+                                "/api/v1/voluntario",
                                 "/api/v1/voluntario/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
