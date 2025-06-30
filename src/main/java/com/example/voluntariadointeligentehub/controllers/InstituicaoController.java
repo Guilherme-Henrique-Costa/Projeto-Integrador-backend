@@ -48,9 +48,15 @@ public class InstituicaoController {
 
     @PostMapping
     public ResponseEntity<Instituicao> create(@Valid @RequestBody Instituicao instituicao) {
+        // ❌ Remover essa criptografia duplicada
+        // String encodedPassword = encoder.encode(instituicao.getPassword());
+        // instituicao.setPassword(encodedPassword);
+
+        // ✅ Apenas chame o service que já faz isso corretamente:
         Instituicao createdInstituicao = instituicaoService.create(instituicao);
         return new ResponseEntity<>(createdInstituicao, HttpStatus.CREATED);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Instituicao> update(@PathVariable Long id, @Valid @RequestBody Instituicao instituicao) {
