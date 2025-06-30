@@ -1,3 +1,4 @@
+// Atualizado SecurityConfig.java com correções para CORS + CSRF + OPTIONS
 package com.example.voluntariadointeligentehub.config;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,8 +21,10 @@ public class SecuriryConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/voluntario").permitAll()
                         .requestMatchers(
                                 "/api/v1/instituicao/**",
