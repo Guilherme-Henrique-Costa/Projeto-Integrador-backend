@@ -33,7 +33,7 @@ public class SecuriryConfig {
                                 "/api/v1/voluntario/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/api/vagasInstituicao",
+                                "/api/v1/vagasInstituicao",
                                 "/api/v1/instituicao",
                                 "/api/v1/vagasDisponiveis",
                                 "/api/v1/candidaturas",
