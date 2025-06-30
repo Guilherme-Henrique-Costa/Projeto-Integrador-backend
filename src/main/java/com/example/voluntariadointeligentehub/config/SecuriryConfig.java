@@ -27,6 +27,7 @@ public class SecuriryConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/voluntario").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/vagasInstituicao").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/instituicao/login").permitAll()
                         .requestMatchers(
                                 "/api/v1/instituicao/**",
                                 "/api/v1/voluntario/login",
