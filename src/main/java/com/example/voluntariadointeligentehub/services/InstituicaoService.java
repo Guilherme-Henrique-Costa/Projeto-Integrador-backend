@@ -50,6 +50,11 @@ public class InstituicaoService {
         return resultado.isPresent() ? ResponseEntity.ok(resultado) : ResponseEntity.notFound().build();
     }
 
+    public Optional<Instituicao> buscarPorEmail(String email) {
+        return instituicaoRepository.findByEmail(email);
+    }
+
+
     @Transactional
     public Instituicao create(Instituicao instituicao) {
         try {

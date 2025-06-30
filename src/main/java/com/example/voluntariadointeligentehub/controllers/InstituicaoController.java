@@ -75,7 +75,32 @@ public class InstituicaoController {
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String password = request.get("password");
-        String token = instituicaoService.login(email, password);
+
+        System.out.println("📩 Login recebido:");
+        System.out.println("Email: " + email);
+        System.out.println("Password (raw): " + password);
+
+        Optional<Instituicao> optional = instituicaoService.buscarPorEmail(email);
+
+        if (optional.isEmpty()) {
+            System.out.println("❌ Email não encontrado: " + email);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("erro", "Email não encontrado"));
+        }
+
+        Instituicao instituicao = optional.get();
+
+        boolean senhaConfere = encoder.matches(password, instituicao.getPassword());
+        System.out.println("🔍 Resultado da verificação de senha: " + senhaConfere);
+
+        if (!senhaConfere) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("erro", "Senha incorreta"));
+        }
+
+        String token = instituicaoService.login(email, password); // gere o token aqui
+        System.out.println("✅ Login bem-sucedido. Token gerado.");
+
         return ResponseEntity.ok(Collections.singletonMap("token", token));
     }
 
