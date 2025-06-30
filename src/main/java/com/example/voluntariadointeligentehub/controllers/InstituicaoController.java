@@ -48,9 +48,6 @@ public class InstituicaoController {
 
     @PostMapping
     public ResponseEntity<Instituicao> create(@Valid @RequestBody Instituicao instituicao) {
-        // Criptografa a senha antes de salvar
-        String encodedPassword = encoder.encode(instituicao.getPassword());
-        instituicao.setPassword(encodedPassword);
         Instituicao createdInstituicao = instituicaoService.create(instituicao);
         return new ResponseEntity<>(createdInstituicao, HttpStatus.CREATED);
     }
