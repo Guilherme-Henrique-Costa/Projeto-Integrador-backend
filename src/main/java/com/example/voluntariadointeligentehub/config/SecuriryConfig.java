@@ -3,6 +3,7 @@ package com.example.voluntariadointeligentehub.config;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,11 +22,11 @@ public class SecuriryConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/v1/voluntario").permitAll()
                         .requestMatchers(
                                 "/api/v1/instituicao/**",
                                 "/api/v1/voluntario/login",
                                 "/api/v1/instituicao/login",
-                                "/api/v1/voluntario",
                                 "/api/v1/voluntario/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
