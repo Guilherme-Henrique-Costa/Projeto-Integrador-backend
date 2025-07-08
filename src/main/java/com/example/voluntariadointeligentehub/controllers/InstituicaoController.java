@@ -42,8 +42,14 @@ public class InstituicaoController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<Optional<Instituicao>> findByEmail(@Valid @RequestParam String email) {
-        return instituicaoService.findByEmail(email);
+    public ResponseEntity<Instituicao> findByEmail(@RequestParam String email) {
+        ResponseEntity<Optional<Instituicao>> resposta = instituicaoService.findByEmail(email);
+
+        if (resposta == null || resposta.getBody() == null || resposta.getBody().isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(resposta.getBody().get());
     }
 
     @PostMapping

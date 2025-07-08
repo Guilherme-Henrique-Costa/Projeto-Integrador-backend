@@ -18,7 +18,6 @@ public class VoluntarioService {
     @Autowired
     private VoluntarioRepository voluntarioRepository;
 
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Transactional
     public ResponseEntity<List<Voluntario>> findAll() {
@@ -47,7 +46,7 @@ public class VoluntarioService {
 
     @Transactional
     public Voluntario create(Voluntario voluntario) {
-        voluntario.setSenha(encoder.encode(voluntario.getSenha()));
+        voluntario.setSenha(voluntario.getSenha());
         return voluntarioRepository.save(voluntario);
     }
 
@@ -60,7 +59,7 @@ public class VoluntarioService {
             v.setDataNascimento(data.getDataNascimento());
             v.setGenero(data.getGenero());
             v.setSenha(data.getSenha() != null && !data.getSenha().isBlank()
-                    ? encoder.encode(data.getSenha())
+                    ? data.getSenha()
                     : v.getSenha());
             v.setAtividadeCEUB(data.getAtividadeCEUB());
             v.setEmailInstitucional(data.getEmailInstitucional());
@@ -94,6 +93,6 @@ public class VoluntarioService {
     @Transactional
     public Optional<Voluntario> login(String email, String rawPassword) {
         return voluntarioRepository.findByEmailInstitucional(email)
-                .filter(v -> encoder.matches(rawPassword, v.getSenha()));
+                .filter(v -> rawPassword.equals(v.getSenha()));
     }
 }

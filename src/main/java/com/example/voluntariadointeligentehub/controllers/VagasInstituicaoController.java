@@ -25,4 +25,11 @@ public class VagasInstituicaoController {
     public ResponseEntity<List<VagaInstituicao>> listar() {
         return ResponseEntity.ok(vagaService.listar());
     }
+
+    @GetMapping("/vagasInstituicao/com-candidatos")
+    public ResponseEntity<List<VagaInstituicao>> listarVagasComCandidatos() {
+        List<VagaInstituicao> vagas = vagaService.listarComCandidatos();
+        return ResponseEntity.ok(vagas);
+    }
+
 }

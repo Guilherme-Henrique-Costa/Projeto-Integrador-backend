@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VagaInstituicaoService {
@@ -20,5 +21,13 @@ public class VagaInstituicaoService {
     public List<VagaInstituicao> listar() {
         return vagaRepo.findAll();
     }
+
+    public List<VagaInstituicao> listarComCandidatos() {
+        List<VagaInstituicao> todas = vagaRepo.findAll();
+        return todas.stream()
+                .filter(v -> v.getCandidaturas() != null && !v.getCandidaturas().isEmpty())
+                .collect(Collectors.toList());
+    }
+
 }
 
