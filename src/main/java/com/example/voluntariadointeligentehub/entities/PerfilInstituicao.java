@@ -1,12 +1,6 @@
 package com.example.voluntariadointeligentehub.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "tb_perfil_institucional")
@@ -16,70 +10,67 @@ public class PerfilInstituicao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int cnpj;
+    // Mídia
+    private String logoUrl;
 
-    private String email;
+    // Contato
+    private String telefone;
+    private String whatsapp;
+    private String site;
 
-    private String password;
-    
-    private String nome;
+    // Endereço
+    private String cep;
+    private String endereco;
+    private String numero;
+    private String complemento;
+    private String bairro;
+    private String cidade;
+    private String uf;
 
-    @OneToOne
-    @JoinColumn(name = "instituicao_id", nullable = false)
+    // Relacionamento (1:1) com Instituicao
+    @OneToOne(optional = false)
+    @JoinColumn(name = "instituicao_id", nullable = false, unique = true)
     private Instituicao instituicao;
-    
-    public PerfilInstituicao() {
 
-    }
+    public PerfilInstituicao() {}
 
-    public PerfilInstituicao(
-        Long id,
-        int cnpj,
-        String email,
-        String password,
-        String nome,
-        Instituicao instituicao
-        ) {
+    // Getters/Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-        this.id = id;
-        this.cnpj = cnpj;
-        this.email = email;
-        this.password = password;
-        this.nome = nome;
-        this.instituicao = instituicao;
-    }
+    public String getLogoUrl() { return logoUrl; }
+    public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
 
-    //Getters
-    public int getCnpj() {
-        return cnpj;
-    }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getWhatsapp() { return whatsapp; }
+    public void setWhatsapp(String whatsapp) { this.whatsapp = whatsapp; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getSite() { return site; }
+    public void setSite(String site) { this.site = site; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getCep() { return cep; }
+    public void setCep(String cep) { this.cep = cep; }
 
-    //Setters
-    public void setCnpj(int cnpj) {
-        this.cnpj = cnpj;
-    }
+    public String getEndereco() { return endereco; }
+    public void setEndereco(String endereco) { this.endereco = endereco; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getNumero() { return numero; }
+    public void setNumero(String numero) { this.numero = numero; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getComplemento() { return complemento; }
+    public void setComplemento(String complemento) { this.complemento = complemento; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getBairro() { return bairro; }
+    public void setBairro(String bairro) { this.bairro = bairro; }
+
+    public String getCidade() { return cidade; }
+    public void setCidade(String cidade) { this.cidade = cidade; }
+
+    public String getUf() { return uf; }
+    public void setUf(String uf) { this.uf = uf; }
+
+    public Instituicao getInstituicao() { return instituicao; }
+    public void setInstituicao(Instituicao instituicao) { this.instituicao = instituicao; }
 }

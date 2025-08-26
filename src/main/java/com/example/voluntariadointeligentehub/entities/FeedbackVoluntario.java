@@ -1,17 +1,11 @@
 package com.example.voluntariadointeligentehub.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "tb_feedback_voluntario")
 public class FeedbackVoluntario {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,47 +17,25 @@ public class FeedbackVoluntario {
     @ManyToOne
     @JoinColumn(name = "voluntario_id", nullable = false)
     private Voluntario voluntario;
-    
-    public FeedbackVoluntario() {
 
-    }
+    public FeedbackVoluntario() {}
 
-    public FeedbackVoluntario(
-        Long id,
-        String descricaoVaga,
-        String feedback,
-        Voluntario voluntario
-        ) {
-
+    public FeedbackVoluntario(Long id, String descricaoVaga, String feedback, Voluntario voluntario) {
         this.id = id;
         this.descricaoVaga = descricaoVaga;
         this.feedback = feedback;
         this.voluntario = voluntario;
     }
 
-    //Getters
-    public String getDescricaoVaga() {
-        return descricaoVaga;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getFeedback() {
-        return feedback;
-    }
+    public String getDescricaoVaga() { return descricaoVaga; }
+    public void setDescricaoVaga(String descricaoVaga) { this.descricaoVaga = descricaoVaga; }
 
-    public Voluntario getVoluntario() {
-        return voluntario;
-    }
+    public String getFeedback() { return feedback; }
+    public void setFeedback(String feedback) { this.feedback = feedback; }
 
-    //Setters
-    public void setDescricaoVaga(String descricaoVaga) {
-        this.descricaoVaga = descricaoVaga;
-    }
-
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
-    }
-
-    public void setVoluntario(Voluntario voluntario) {
-        this.voluntario = voluntario;
-    }
+    public Voluntario getVoluntario() { return voluntario; }
+    public void setVoluntario(Voluntario voluntario) { this.voluntario = voluntario; }
 }

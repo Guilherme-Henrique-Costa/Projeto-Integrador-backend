@@ -1,73 +1,86 @@
 package com.example.voluntariadointeligentehub.controllers;
 
+import com.example.voluntariadointeligentehub.entities.FeedbackVoluntario;
+import com.example.voluntariadointeligentehub.services.FeedbackVoluntarioService;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.voluntariadointeligentehub.entities.FeedbackVoluntario;
-import com.example.voluntariadointeligentehub.services.FeedbackVoluntarioService;
-
-import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping("/api/v1/feedback-voluntario")
+@CrossOrigin(origins = "*")
 public class FeedbackVoluntarioController {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(FeedbackVoluntarioController.class);
+
     @Autowired
-    private FeedbackVoluntarioService feedbackVoluntarioService;
+    private FeedbackVoluntarioService service;
 
     @GetMapping("/all")
     public ResponseEntity<List<FeedbackVoluntario>> findAll() {
-
-        return feedbackVoluntarioService.findAll();
+        System.out.println("[FeedbackVoluntarioController] GET /all");
+        var resp = service.findAll();
+        log.info("Listar feedbacks -> {} itens", resp.getBody() != null ? resp.getBody().size() : 0);
+        return resp;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<FeedbackVoluntario>> findById(@Valid @PathVariable Long id) {
-        return feedbackVoluntarioService.findById(id);
+        System.out.println("[FeedbackVoluntarioController] GET /{id} id=" + id);
+        log.info("Buscar feedback id={}", id);
+        return service.findById(id);
     }
 
-    // @GetMapping("/descricaoVaga")
-    // public ResponseEntity<Optional<FeedbackVoluntario>> findByDescricaoVaga(@Valid @RequestParam String descricaoVaga) {
-    //     return FeedbackVoluntarioService.findByDescricaoVaga(descricaoVaga);
-    // }
+    @GetMapping("/voluntario/{voluntarioId}")
+    public ResponseEntity<List<FeedbackVoluntario>> findByVoluntario(@PathVariable Long voluntarioId) {
+        System.out.println("[FeedbackVoluntarioController] GET /voluntario/{id} id=" + voluntarioId);
+        log.info("Listar feedbacks do voluntarioId={}", voluntarioId);
+        return service.findByVoluntario(voluntarioId);
+    }
 
-    // @GetMapping("/area")
-    // public ResponseEntity<Optional<FeedbackVoluntario>> findByArea(@Valid @RequestParam String area) {
-    //     return FeedbackVoluntarioService.findByArea(area);
-    // }
-
-    // @GetMapping("/vagaAbrt")
-    // public ResponseEntity<Optional<FeedbackVoluntario>> findByVagaAbrt(@Valid @RequestParam String vagaAbrt) {
-    //     return FeedbackVoluntarioService.findByVagaAbrt(vagaAbrt);
-    // }
+    @GetMapping("/search")
+    public ResponseEntity<List<FeedbackVoluntario>> search(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false, name = "voluntarioId") Long voluntarioId) {
+        long start = System.currentTimeMillis();
+        System.out.println("[FeedbackVoluntarioController] GET /search q=" + q + " voluntarioId=" + voluntarioId);
+        log.info("Buscar feedbacks por q='{}', voluntarioId={}", q, voluntarioId);
+        var resp = service.search(q, voluntarioId);
+        log.info("Search retornou {} itens ({}ms)",
+                resp.getBody() != null ? resp.getBody().size() : 0,
+                (System.currentTimeMillis() - start));
+        return resp;
+    }
 
     @PostMapping
-    public ResponseEntity<FeedbackVoluntario> create(@Valid @RequestBody FeedbackVoluntario voluntario) {
-        FeedbackVoluntario createdVoluntario = feedbackVoluntarioService.create(voluntario);
-        return new ResponseEntity<>(createdVoluntario, HttpStatus.CREATED);
+    public ResponseEntity<FeedbackVoluntario> create(@Valid @RequestBody FeedbackVoluntario body) {
+        System.out.println("[FeedbackVoluntarioController] POST / (create) voluntarioId="
+                + (body.getVoluntario() != null ? body.getVoluntario().getId() : null));
+        log.info("Criando feedback para voluntarioId={}",
+                body.getVoluntario() != null ? body.getVoluntario().getId() : null);
+        return new ResponseEntity<>(service.create(body), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FeedbackVoluntario> update(
-            @PathVariable Long id, @Valid @RequestBody FeedbackVoluntario voluntario) {
-        return ResponseEntity.of(feedbackVoluntarioService.update(id, voluntario));
+    public ResponseEntity<FeedbackVoluntario> update(@PathVariable Long id, @Valid @RequestBody FeedbackVoluntario body) {
+        System.out.println("[FeedbackVoluntarioController] PUT /{id} id=" + id);
+        log.info("Atualizando feedback id={}", id);
+        var resp = ResponseEntity.of(service.update(id, body));
+        log.info("Atualização feedback id={} -> status={}", id, resp.getStatusCode());
+        return resp;
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean deleted = feedbackVoluntarioService.delete(id);
+        System.out.println("[FeedbackVoluntarioController] DELETE /{id} id=" + id);
+        log.info("Excluindo feedback id={}", id);
+        boolean deleted = service.delete(id);
+        log.info("Exclusão feedback id={} -> {}", id, deleted ? "DELETADO" : "NÃO ENCONTRADO");
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }

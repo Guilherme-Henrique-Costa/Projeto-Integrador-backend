@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,17 +26,42 @@ public class Instituicao {
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
     @Column(length = 60)
-    private String password;
+    private String senha;
 
     @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
+    // Contatos/descrição
     private String interestArea;
     private String telefoneContato;
+    private String description;
+
+    // Endereço (alinhado ao Angular)
+    private String cep;
     private String endereco;
-    private String areaAtuacao;
-    private String causasApoio;
-    private String habilidadesRequeridas;
+    private String numero;
+    private String complemento;
+    private String bairro;
+    private String cidade;
+    private String uf;
+
+    // Seleções (arrays) - alinhar com Angular [areaAtuacao, causasApoio, habilidadesRequeridas]
+    @ElementCollection
+    @CollectionTable(name = "tb_inst_area_atuacao", joinColumns = @JoinColumn(name = "instituicao_id"))
+    @Column(name = "area")
+    private List<String> areaAtuacao = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "tb_inst_causas", joinColumns = @JoinColumn(name = "instituicao_id"))
+    @Column(name = "causa")
+    private List<String> causasApoio = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "tb_inst_habs", joinColumns = @JoinColumn(name = "instituicao_id"))
+    @Column(name = "habilidade")
+    private List<String> habilidadesRequeridas = new ArrayList<>();
+
+    // Demais campos
     private String responsavelPreenchimento;
     private String nomeContatoVoluntariado;
     private String funcaoContatoVoluntariado;
@@ -70,8 +96,8 @@ public class Instituicao {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
@@ -82,17 +108,38 @@ public class Instituicao {
     public String getTelefoneContato() { return telefoneContato; }
     public void setTelefoneContato(String telefoneContato) { this.telefoneContato = telefoneContato; }
 
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getCep() { return cep; }
+    public void setCep(String cep) { this.cep = cep; }
+
     public String getEndereco() { return endereco; }
     public void setEndereco(String endereco) { this.endereco = endereco; }
 
-    public String getAreaAtuacao() { return areaAtuacao; }
-    public void setAreaAtuacao(String areaAtuacao) { this.areaAtuacao = areaAtuacao; }
+    public String getNumero() { return numero; }
+    public void setNumero(String numero) { this.numero = numero; }
 
-    public String getCausasApoio() { return causasApoio; }
-    public void setCausasApoio(String causasApoio) { this.causasApoio = causasApoio; }
+    public String getComplemento() { return complemento; }
+    public void setComplemento(String complemento) { this.complemento = complemento; }
 
-    public String getHabilidadesRequeridas() { return habilidadesRequeridas; }
-    public void setHabilidadesRequeridas(String habilidadesRequeridas) { this.habilidadesRequeridas = habilidadesRequeridas; }
+    public String getBairro() { return bairro; }
+    public void setBairro(String bairro) { this.bairro = bairro; }
+
+    public String getCidade() { return cidade; }
+    public void setCidade(String cidade) { this.cidade = cidade; }
+
+    public String getUf() { return uf; }
+    public void setUf(String uf) { this.uf = uf; }
+
+    public List<String> getAreaAtuacao() { return areaAtuacao; }
+    public void setAreaAtuacao(List<String> areaAtuacao) { this.areaAtuacao = areaAtuacao; }
+
+    public List<String> getCausasApoio() { return causasApoio; }
+    public void setCausasApoio(List<String> causasApoio) { this.causasApoio = causasApoio; }
+
+    public List<String> getHabilidadesRequeridas() { return habilidadesRequeridas; }
+    public void setHabilidadesRequeridas(List<String> habilidadesRequeridas) { this.habilidadesRequeridas = habilidadesRequeridas; }
 
     public String getResponsavelPreenchimento() { return responsavelPreenchimento; }
     public void setResponsavelPreenchimento(String responsavelPreenchimento) { this.responsavelPreenchimento = responsavelPreenchimento; }
@@ -148,11 +195,6 @@ public class Instituicao {
     public PerfilInstituicao getPerfilInstituicao() { return perfilInstituicao; }
     public void setPerfilInstituicao(PerfilInstituicao perfilInstituicao) { this.perfilInstituicao = perfilInstituicao; }
 
-    public List<Voluntario> getVoluntarios() {
-        return voluntarios;
-    }
-
-    public void setVoluntarios(List<Voluntario> voluntarios) {
-        this.voluntarios = voluntarios;
-    }
+    public List<Voluntario> getVoluntarios() { return voluntarios; }
+    public void setVoluntarios(List<Voluntario> voluntarios) { this.voluntarios = voluntarios; }
 }

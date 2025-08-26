@@ -4,16 +4,14 @@ import com.example.voluntariadointeligentehub.entities.Voluntario;
 import com.example.voluntariadointeligentehub.services.VoluntarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/voluntario")
+@CrossOrigin(origins = "*")
 public class VoluntarioController {
 
     @Autowired
@@ -59,14 +57,18 @@ public class VoluntarioController {
     public ResponseEntity<List<Voluntario>> findByDisponibilidade(@RequestParam String turno) {
         return ResponseEntity.ok(voluntarioService.findByDisponibilidadeSemanal(turno));
     }
+
     @PostMapping("/login")
     public ResponseEntity<Voluntario> login(@RequestBody Map<String, String> loginData) {
         String email = loginData.get("emailInstitucional");
         String password = loginData.get("password");
-
-        Optional<Voluntario> voluntarioOpt = voluntarioService.login(email, password);
-        return voluntarioOpt
-                .map(ResponseEntity::ok)
+        return voluntarioService.login(email, password)
+                .map(v -> ResponseEntity.ok(v))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Voluntario>> search(@RequestParam(required = false) String q) {
+        return ResponseEntity.ok(voluntarioService.search(q));
     }
 }

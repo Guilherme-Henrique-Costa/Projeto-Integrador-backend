@@ -11,8 +11,8 @@ public class VagasVoluntariasDTO {
 
     private Long id;
     private LocalDate dataCandidatura;
+    private String status;
 
-    // Dados da vaga
     private Long vagaId;
     private String cargo;
     private String localidade;
@@ -24,12 +24,10 @@ public class VagasVoluntariasDTO {
     private String tempoVoluntariado;
     private String disponibilidade;
 
-    // Localização da vaga
     private Double latitude;
     private Double longitude;
     private String cidade;
 
-    // Dados da instituição
     private Long instituicaoId;
     private String instituicaoNome;
 
@@ -40,6 +38,7 @@ public class VagasVoluntariasDTO {
         VagasVoluntariasDTO dto = new VagasVoluntariasDTO();
         dto.setId(entity.getId());
         dto.setDataCandidatura(entity.getDataCandidatura());
+        dto.setStatus(entity.getStatus());
 
         dto.setVagaId(vaga.getId());
         dto.setCargo(vaga.getCargo());
@@ -58,16 +57,18 @@ public class VagasVoluntariasDTO {
 
         dto.setInstituicaoId(inst.getId());
         dto.setInstituicaoNome(inst.getNome());
-
         return dto;
     }
 
-    // Getters e Setters
+    // getters e setters ...
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
     public LocalDate getDataCandidatura() { return dataCandidatura; }
     public void setDataCandidatura(LocalDate dataCandidatura) { this.dataCandidatura = dataCandidatura; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public Long getVagaId() { return vagaId; }
     public void setVagaId(Long vagaId) { this.vagaId = vagaId; }

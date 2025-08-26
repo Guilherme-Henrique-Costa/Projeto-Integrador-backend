@@ -24,6 +24,15 @@ public class VagasVoluntarias {
 
     private LocalDate dataCandidatura;
 
+    @Column(length = 20)
+    private String status; // PENDENTE | APROVADO | REJEITADO
+
+    @PrePersist
+    public void prePersist() {
+        if (dataCandidatura == null) dataCandidatura = LocalDate.now();
+        if (status == null || status.isBlank()) status = "PENDENTE";
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -35,4 +44,7 @@ public class VagasVoluntarias {
 
     public LocalDate getDataCandidatura() { return dataCandidatura; }
     public void setDataCandidatura(LocalDate dataCandidatura) { this.dataCandidatura = dataCandidatura; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

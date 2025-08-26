@@ -1,127 +1,95 @@
 package com.example.voluntariadointeligentehub.services;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.example.voluntariadointeligentehub.entities.FeedbackVoluntario;
+import com.example.voluntariadointeligentehub.repositories.FeedbackVoluntarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.example.voluntariadointeligentehub.entities.FeedbackVoluntario;
-import com.example.voluntariadointeligentehub.repositories.FeedbackVoluntarioRepository;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FeedbackVoluntarioService {
 
+    private static final Logger log = LoggerFactory.getLogger(FeedbackVoluntarioService.class);
+
     @Autowired
-    private FeedbackVoluntarioRepository feedbackVoluntarioRepository;
+    private FeedbackVoluntarioRepository repo;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<List<FeedbackVoluntario>> findAll() {
-        try {
-            List<FeedbackVoluntario> resultado = feedbackVoluntarioRepository.findAll();
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println("Erro ao buscar vagas voluntarias: " + e.getMessage());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar os FeedbackVoluntarios.");
-        }
+        System.out.println("[FeedbackVoluntarioService] findAll()");
+        List<FeedbackVoluntario> list = repo.findAll();
+        log.debug("findAll -> {} registros", list.size());
+        return ResponseEntity.ok(list);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<Optional<FeedbackVoluntario>> findById(Long id) {
-        try {
-            Optional<FeedbackVoluntario> resultado = feedbackVoluntarioRepository.findById(id);
-
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println(
-                    "Erro ao buscar FeedbackVoluntario por id: " + e.getMessage() + e.getCause());
-
-            throw new RuntimeException(
-                    "Ocorreu um erro ao buscar vagas voluntarias por id");
-        }
+        System.out.println("[FeedbackVoluntarioService] findById id=" + id);
+        Optional<FeedbackVoluntario> opt = repo.findById(id);
+        log.debug("findById({}) -> present={}", id, opt.isPresent());
+        return ResponseEntity.ok(opt);
     }
 
-    // @Transactional
-    // public ResponseEntity<Optional<FeedbackVoluntario>> findByDescricaoVaga(String descricaoVaga) {
-    //     try {
-    //         Optional<FeedbackVoluntario> resultado = feedbackVoluntarioRepository.findByDescricaoVaga(descricaoVaga);
-    //         return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-    //                 ResponseEntity.notFound().build();
-    //     } catch (Exception e) {
-    //         System.err.println(
-    //                 "Erro ao buscar FeedbackVoluntario por nome: " + e.getMessage() + e.getCause());
-    //         throw new RuntimeException(
-    //                 "Ocorreu um erro ao buscar FeedbackVoluntario por nome");
-    //     }
-    // }
-    // @Transactional
-    // public ResponseEntity<Optional<FeedbackVoluntario>> findByArea(String area) {
-    //     try {
-    //         Optional<FeedbackVoluntario> resultado = feedbackVoluntarioRepository.findByArea(area);
-    //         return resultado.isPresent() ? ResponseEntity.ok(resultado) :
-    //                 ResponseEntity.notFound().build();
-    //     } catch (Exception e) {
-    //         System.err.println(
-    //                 "Erro ao buscar FeedbackVoluntario por email: " + e.getMessage() + e.getCause());
-    //         throw new RuntimeException(
-    //                 "Ocorreu um erro ao buscar FeedbackVoluntario por email");
-    //     }
-    // }
-    // @Transactional
-    // public ResponseEntity<Optional<FeedbackVoluntario>> findByVagaAbrt(String vagaAbrt) {
-    //     try {
-    //         Optional<FeedbackVoluntario> resultado = feedbackVoluntarioRepository.findByVagaAbrt(vagaAbrt);
-    //         return ResponseEntity.ok(resultado);
-    //     } catch (Exception e) {
-    //         System.err.println(
-    //                 "Erro ao buscar FeedbackVoluntario por senha: " + e.getMessage() + e.getCause());
-    //         throw new RuntimeException(
-    //                 "Ocorreu um erro ao buscar FeedbackVoluntario por senha");
-    //     }
-    // }
-    @Transactional
-    public FeedbackVoluntario create(FeedbackVoluntario FeedbackVoluntario) {
-        try {
-            return feedbackVoluntarioRepository.save(FeedbackVoluntario);
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao criar FeedbackVoluntario: " + e.getMessage());
-        }
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<FeedbackVoluntario>> findByVoluntario(Long voluntarioId) {
+        System.out.println("[FeedbackVoluntarioService] findByVoluntario voluntarioId=" + voluntarioId);
+        List<FeedbackVoluntario> list = repo.findByVoluntario_Id(voluntarioId);
+        log.info("findByVoluntario({}) -> {} itens", voluntarioId, list.size());
+        return ResponseEntity.ok(list);
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<FeedbackVoluntario>> search(String q, Long voluntarioId) {
+        long start = System.currentTimeMillis();
+        System.out.println("[FeedbackVoluntarioService] search q=" + q + " voluntarioId=" + voluntarioId);
+        List<FeedbackVoluntario> list = repo.search(q, voluntarioId);
+        long took = System.currentTimeMillis() - start;
+        log.info("search(q='{}', voluntarioId={}) -> {} itens ({}ms)", q, voluntarioId, list.size(), took);
+        return ResponseEntity.ok(list);
     }
 
     @Transactional
-    public Optional<FeedbackVoluntario> update(Long id, FeedbackVoluntario feedbackVoluntarioDetails) {
-        try {
-            Optional<FeedbackVoluntario> existingFeedbackVoluntario = feedbackVoluntarioRepository.findById(id);
-            if (existingFeedbackVoluntario.isPresent()) {
-                FeedbackVoluntario feedbackVoluntario = existingFeedbackVoluntario.get();
-                feedbackVoluntario.setDescricaoVaga(feedbackVoluntarioDetails.getDescricaoVaga());
-                feedbackVoluntario.setFeedback(feedbackVoluntarioDetails.getFeedback());
-                return Optional.of(feedbackVoluntarioRepository.save(feedbackVoluntario));
-            } else {
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao atualizar Perfil FeedbackVoluntario: " + e.getMessage());
-        }
+    public FeedbackVoluntario create(FeedbackVoluntario body) {
+        System.out.println("[FeedbackVoluntarioService] create voluntarioId="
+                + (body.getVoluntario() != null ? body.getVoluntario().getId() : null));
+        FeedbackVoluntario saved = repo.save(body);
+        log.info("Feedback criado id={} voluntarioId={}",
+                saved.getId(), saved.getVoluntario() != null ? saved.getVoluntario().getId() : null);
+        System.out.println("[FeedbackVoluntarioService] create OK id=" + saved.getId());
+        return saved;
+    }
+
+    @Transactional
+    public Optional<FeedbackVoluntario> update(Long id, FeedbackVoluntario details) {
+        System.out.println("[FeedbackVoluntarioService] update id=" + id);
+        return repo.findById(id).map(f -> {
+            f.setDescricaoVaga(details.getDescricaoVaga());
+            f.setFeedback(details.getFeedback());
+            f.setVoluntario(details.getVoluntario());
+            FeedbackVoluntario saved = repo.save(f);
+            log.info("Feedback atualizado id={}", id);
+            System.out.println("[FeedbackVoluntarioService] update OK id=" + id);
+            return saved;
+        });
     }
 
     @Transactional
     public boolean delete(Long id) {
-        try {
-            Optional<FeedbackVoluntario> existingMensagemVoluntaria = feedbackVoluntarioRepository.findById(id);
-            if (existingMensagemVoluntaria.isPresent()) {
-                feedbackVoluntarioRepository.deleteById(id);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao deletar MensagemVoluntaria: " + e.getMessage());
+        System.out.println("[FeedbackVoluntarioService] delete id=" + id);
+        Optional<FeedbackVoluntario> existing = repo.findById(id);
+        if (existing.isPresent()) {
+            repo.deleteById(id);
+            log.info("Feedback deletado id={}", id);
+            System.out.println("[FeedbackVoluntarioService] delete OK id=" + id);
+            return true;
         }
+        log.warn("Tentativa de deletar feedback inexistente id={}", id);
+        System.out.println("[FeedbackVoluntarioService] delete NOT FOUND id=" + id);
+        return false;
     }
 }

@@ -7,6 +7,8 @@ import com.example.voluntariadointeligentehub.entities.Instituicao;
 import com.example.voluntariadointeligentehub.entities.PerfilInstituicao;
 import com.example.voluntariadointeligentehub.repositories.InstituicaoRepository;
 import com.example.voluntariadointeligentehub.repositories.PerfilInstituicaoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,106 +17,137 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PerfilInstituicaoService {
 
-    @Autowired
-    private PerfilInstituicaoRepository perfilInstituicaoRepository;
+    private static final Logger log = LoggerFactory.getLogger(PerfilInstituicaoService.class);
 
-    @Autowired
-    private InstituicaoRepository instituicaoRepository;
+    @Autowired private PerfilInstituicaoRepository perfilRepo;
+    @Autowired private InstituicaoRepository instRepo;
 
-
-    @Transactional
+    // ===== Leitura =====
+    @Transactional(readOnly = true)
     public ResponseEntity<List<PerfilInstituicao>> findAll() {
-        try {
-            List<PerfilInstituicao> resultado = perfilInstituicaoRepository.findAll();
-            System.out.println("📋 Total de perfis de instituições encontrados: " + resultado.size());
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao buscar perfis: " + e.getMessage());
-            throw new RuntimeException("Erro ao buscar perfis");
-        }
+        System.out.println("[PerfilInstituicaoService] findAll()");
+        List<PerfilInstituicao> all = perfilRepo.findAll();
+        log.debug("findAll -> {} registros", all.size());
+        return ResponseEntity.ok(all);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<Optional<PerfilInstituicao>> findById(Long id) {
-        try {
-            Optional<PerfilInstituicao> resultado = perfilInstituicaoRepository.findById(id);
-            System.out.println("🔍 Resultado por ID: " + resultado);
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao buscar por ID: " + e.getMessage());
-            throw new RuntimeException("Erro ao buscar por ID");
-        }
+        System.out.println("[PerfilInstituicaoService] findById id=" + id);
+        Optional<PerfilInstituicao> opt = perfilRepo.findById(id);
+        log.debug("findById({}) -> present={}", id, opt.isPresent());
+        return ResponseEntity.ok(opt);
     }
 
+    @Transactional(readOnly = true)
+    public ResponseEntity<Optional<PerfilInstituicao>> findByInstituicaoId(Long instituicaoId) {
+        System.out.println("[PerfilInstituicaoService] findByInstituicaoId instituicaoId=" + instituicaoId);
+        Optional<PerfilInstituicao> opt = perfilRepo.findByInstituicaoId(instituicaoId);
+        log.debug("findByInstituicaoId({}) -> present={}", instituicaoId, opt.isPresent());
+        return ResponseEntity.ok(opt);
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<Optional<PerfilInstituicao>> findByEmail(String email) {
+        System.out.println("[PerfilInstituicaoService] findByEmail email=" + email);
+        Optional<PerfilInstituicao> opt = perfilRepo.findByInstituicaoEmail(email);
+        log.debug("findByEmail('{}') -> present={}", email, opt.isPresent());
+        return ResponseEntity.ok(opt);
+    }
+
+    // ===== Upsert por instituicaoId =====
     @Transactional
-    public PerfilInstituicao create(PerfilInstituicao perfilInstituicao) {
-        try {
-            PerfilInstituicao criado = perfilInstituicaoRepository.save(perfilInstituicao);
-            System.out.println("✅ Perfil criado: " + criado.getNome());
-            return criado;
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao criar perfil: " + e.getMessage());
-            throw new RuntimeException("Erro ao criar perfil");
+    public ResponseEntity<PerfilInstituicao> upsertByInstituicaoId(Long instituicaoId, PerfilInstituicao dados) {
+        long start = System.currentTimeMillis();
+        System.out.println("[PerfilInstituicaoService] upsert instituicaoId=" + instituicaoId);
+        log.info("Upsert PerfilInstituicao instituicaoId={}", instituicaoId);
+
+        Instituicao inst = instRepo.findById(instituicaoId)
+                .orElseThrow(() -> new RuntimeException("Instituição não encontrada"));
+
+        PerfilInstituicao perfil = perfilRepo.findByInstituicaoId(instituicaoId)
+                .orElseGet(() -> {
+                    PerfilInstituicao p = new PerfilInstituicao();
+                    p.setInstituicao(inst);
+                    log.debug("Criando novo PerfilInstituicao para instituicaoId={}", instituicaoId);
+                    return p;
+                });
+
+        // aplica campos editáveis
+        perfil.setLogoUrl(dados.getLogoUrl());
+        perfil.setTelefone(dados.getTelefone());
+        perfil.setWhatsapp(dados.getWhatsapp());
+        perfil.setSite(dados.getSite());
+        perfil.setCep(dados.getCep());
+        perfil.setEndereco(dados.getEndereco());
+        perfil.setNumero(dados.getNumero());
+        perfil.setComplemento(dados.getComplemento());
+        perfil.setBairro(dados.getBairro());
+        perfil.setCidade(dados.getCidade());
+        perfil.setUf(dados.getUf());
+
+        PerfilInstituicao salvo = perfilRepo.save(perfil);
+        long took = System.currentTimeMillis() - start;
+        log.info("Upsert PerfilInstituicao OK instituicaoId={} perfilId={} ({}ms)",
+                instituicaoId, salvo.getId(), took);
+        System.out.println("[PerfilInstituicaoService] upsert OK perfilId=" + salvo.getId() + " (" + took + "ms)");
+        return ResponseEntity.ok(salvo);
+    }
+
+    // ===== CRUD "puro" (se necessário) =====
+    @Transactional
+    public PerfilInstituicao create(PerfilInstituicao perfil) {
+        System.out.println("[PerfilInstituicaoService] create instituicaoId="
+                + (perfil.getInstituicao() != null ? perfil.getInstituicao().getId() : null));
+        if (perfil.getInstituicao() == null || perfil.getInstituicao().getId() == null) {
+            log.warn("create -> instituicao.id ausente");
+            throw new RuntimeException("instituicao.id é obrigatório");
         }
+        // garante existência
+        instRepo.findById(perfil.getInstituicao().getId())
+                .orElseThrow(() -> new RuntimeException("Instituição não encontrada"));
+
+        PerfilInstituicao saved = perfilRepo.save(perfil);
+        log.info("PerfilInstituicao criado id={} para instituicaoId={}",
+                saved.getId(), perfil.getInstituicao().getId());
+        System.out.println("[PerfilInstituicaoService] create OK perfilId=" + saved.getId());
+        return saved;
     }
 
     @Transactional
     public Optional<PerfilInstituicao> update(Long id, PerfilInstituicao dados) {
-        try {
-            Optional<PerfilInstituicao> existente = perfilInstituicaoRepository.findById(id);
-            if (existente.isPresent()) {
-                PerfilInstituicao atual = existente.get();
-                atual.setCnpj(dados.getCnpj());
-                atual.setEmail(dados.getEmail());
-                atual.setPassword(dados.getPassword());
-                atual.setNome(dados.getNome());
-
-                PerfilInstituicao salvo = perfilInstituicaoRepository.save(atual);
-                System.out.println("✏️ Perfil atualizado: " + salvo.getNome());
-                return Optional.of(salvo);
-            } else {
-                System.out.println("⚠️ Perfil com ID " + id + " não encontrado.");
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao atualizar: " + e.getMessage());
-            throw new RuntimeException("Erro ao atualizar");
-        }
+        System.out.println("[PerfilInstituicaoService] update id=" + id);
+        return perfilRepo.findById(id).map(p -> {
+            p.setLogoUrl(dados.getLogoUrl());
+            p.setTelefone(dados.getTelefone());
+            p.setWhatsapp(dados.getWhatsapp());
+            p.setSite(dados.getSite());
+            p.setCep(dados.getCep());
+            p.setEndereco(dados.getEndereco());
+            p.setNumero(dados.getNumero());
+            p.setComplemento(dados.getComplemento());
+            p.setBairro(dados.getBairro());
+            p.setCidade(dados.getCidade());
+            p.setUf(dados.getUf());
+            PerfilInstituicao saved = perfilRepo.save(p);
+            log.info("PerfilInstituicao atualizado id={}", id);
+            System.out.println("[PerfilInstituicaoService] update OK id=" + id);
+            return saved;
+        });
     }
 
     @Transactional
     public boolean delete(Long id) {
-        try {
-            Optional<PerfilInstituicao> existente = perfilInstituicaoRepository.findById(id);
-            if (existente.isPresent()) {
-                perfilInstituicaoRepository.deleteById(id);
-                System.out.println("🗑️ Perfil deletado: " + id);
-                return true;
-            } else {
-                System.out.println("⚠️ Perfil com ID " + id + " não encontrado para deletar.");
-                return false;
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao deletar: " + e.getMessage());
-            throw new RuntimeException("Erro ao deletar");
-        }
+        System.out.println("[PerfilInstituicaoService] delete id=" + id);
+        return perfilRepo.findById(id).map(p -> {
+            perfilRepo.deleteById(id);
+            log.info("PerfilInstituicao deletado id={}", id);
+            System.out.println("[PerfilInstituicaoService] delete OK id=" + id);
+            return true;
+        }).orElseGet(() -> {
+            log.warn("Tentativa de delete de PerfilInstituicao inexistente id={}", id);
+            System.out.println("[PerfilInstituicaoService] delete NOT FOUND id=" + id);
+            return false;
+        });
     }
-
-    @Transactional
-    public ResponseEntity<Optional<Instituicao>> findByEmail(String email) {
-        try {
-            System.out.println("🔍 Buscando instituição por e-mail: " + email);
-            Optional<Instituicao> resultado = instituicaoRepository.findByEmail(email);
-            if (resultado.isPresent()) {
-                System.out.println("✅ Instituição encontrada: " + resultado.get().getNome());
-                return ResponseEntity.ok(resultado);
-            } else {
-                System.out.println("⚠️ Instituição não encontrada.");
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao buscar instituição por e-mail: " + e.getMessage());
-        }
-    }
-
 }

@@ -3,14 +3,12 @@ package com.example.voluntariadointeligentehub.services;
 import com.example.voluntariadointeligentehub.entities.Voluntario;
 import com.example.voluntariadointeligentehub.repositories.VoluntarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class VoluntarioService {
@@ -18,35 +16,37 @@ public class VoluntarioService {
     @Autowired
     private VoluntarioRepository voluntarioRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<List<Voluntario>> findAll() {
         return ResponseEntity.ok(voluntarioRepository.findAll());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<Optional<Voluntario>> findById(Long id) {
         return ResponseEntity.ok(voluntarioRepository.findById(id));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<Optional<Voluntario>> findByNome(String nome) {
         return ResponseEntity.ok(voluntarioRepository.findByNome(nome));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<Optional<Voluntario>> findByEmailInstitucional(String email) {
         return ResponseEntity.ok(voluntarioRepository.findByEmailInstitucional(email));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<Boolean> verificarCpf(String cpf) {
         return ResponseEntity.ok(voluntarioRepository.findByCpf(cpf).isPresent());
     }
 
     @Transactional
     public Voluntario create(Voluntario voluntario) {
-        voluntario.setSenha(voluntario.getSenha());
+        voluntario.setSenha(passwordEncoder.encode(voluntario.getSenha()));
         return voluntarioRepository.save(voluntario);
     }
 
@@ -59,7 +59,7 @@ public class VoluntarioService {
             v.setDataNascimento(data.getDataNascimento());
             v.setGenero(data.getGenero());
             v.setSenha(data.getSenha() != null && !data.getSenha().isBlank()
-                    ? data.getSenha()
+                    ? passwordEncoder.encode(data.getSenha())
                     : v.getSenha());
             v.setAtividadeCEUB(data.getAtividadeCEUB());
             v.setEmailInstitucional(data.getEmailInstitucional());
@@ -73,6 +73,7 @@ public class VoluntarioService {
             v.setDisponibilidadeSemanal(data.getDisponibilidadeSemanal());
             v.setComentarios(data.getComentarios());
             v.setAvatarPath(data.getAvatarPath());
+            v.setInstituicao(data.getInstituicao());
             return voluntarioRepository.save(v);
         });
     }
@@ -85,14 +86,25 @@ public class VoluntarioService {
         }).orElse(false);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Voluntario> findByDisponibilidadeSemanal(String turno) {
         return voluntarioRepository.findByDisponibilidadeSemanalContaining(turno);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<Voluntario> login(String email, String rawPassword) {
         return voluntarioRepository.findByEmailInstitucional(email)
-                .filter(v -> rawPassword.equals(v.getSenha()));
+                .filter(v -> passwordEncoder.matches(rawPassword, v.getSenha()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Voluntario> search(String q) {
+        return voluntarioRepository.search((q == null || q.isBlank()) ? null : q.trim());
+    }
+
+    @Transactional(readOnly = true)
+    public Voluntario buscarPorEmail(String email) {
+        return voluntarioRepository.findByEmailInstitucional(email)
+                .orElseThrow(() -> new RuntimeException("Voluntário não encontrado"));
     }
 }

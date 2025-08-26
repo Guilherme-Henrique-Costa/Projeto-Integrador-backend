@@ -1,12 +1,10 @@
 package com.example.voluntariadointeligentehub.services;
 
-import com.example.voluntariadointeligentehub.dto.VagasVoluntariasDTO;
-import com.example.voluntariadointeligentehub.entities.VagaInstituicao;
+import com.example.voluntariadointeligentehub.dto.CandidaturaDTO;
 import com.example.voluntariadointeligentehub.entities.VagasVoluntarias;
-import com.example.voluntariadointeligentehub.entities.Voluntario;
-import com.example.voluntariadointeligentehub.repositories.VagaInstituicaoRepository;
 import com.example.voluntariadointeligentehub.repositories.VagasVoluntariasRepository;
-import com.example.voluntariadointeligentehub.repositories.VoluntarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,45 +17,49 @@ import java.util.stream.Collectors;
 @Service
 public class VagasVoluntariasService {
 
+    private static final Logger log = LoggerFactory.getLogger(VagasVoluntariasService.class);
+
     @Autowired
     private VagasVoluntariasRepository repository;
 
-    @Autowired
-    private VagaInstituicaoRepository vagaRepo;
-
-    @Autowired
-    private VoluntarioRepository voluntarioRepo;
-
     @Transactional
     public ResponseEntity<?> candidatar(VagasVoluntarias candidatura) {
-        VagaInstituicao vaga = vagaRepo.findById(candidatura.getVaga().getId()).orElse(null);
-        Voluntario voluntario = voluntarioRepo.findById(candidatura.getVoluntario().getId()).orElse(null);
+        long start = System.currentTimeMillis();
+        System.out.println("[VagasVoluntariasService] candidatar voluntarioId="
+                + (candidatura.getVoluntario() != null ? candidatura.getVoluntario().getId() : null)
+                + " vagaId=" + (candidatura.getVaga() != null ? candidatura.getVaga().getId() : null));
+        Long volId = candidatura.getVoluntario() != null ? candidatura.getVoluntario().getId() : null;
+        Long vagaId = candidatura.getVaga() != null ? candidatura.getVaga().getId() : null;
+        log.info("Candidatar(volId={}, vagaId={})", volId, vagaId);
 
-        if (vaga == null || voluntario == null) {
-            return ResponseEntity.badRequest().body("Voluntário ou vaga inválida.");
+        // Evita duplicidade (voluntário já se candidatou à mesma vaga)
+        boolean exists = repository.existsByVoluntario_IdAndVaga_Id(volId, vagaId);
+        log.debug("existsByVoluntario_IdAndVaga_Id({}, {}) -> {}", volId, vagaId, exists);
+        if (exists) {
+            log.warn("Candidatura duplicada: volId={} vagaId={}", volId, vagaId);
+            return ResponseEntity.status(409).body("Voluntário já está cadastrado nesta vaga.");
         }
 
-        candidatura.setVaga(vaga);
-        candidatura.setVoluntario(voluntario);
-        candidatura.setDataCandidatura(LocalDate.now());
+        if (candidatura.getDataCandidatura() == null) {
+            candidatura.setDataCandidatura(LocalDate.now());
+        }
 
-        repository.save(candidatura);
-        return ResponseEntity.ok("Candidatura registrada com sucesso.");
+        VagasVoluntarias salva = repository.save(candidatura);
+        log.info("Candidatura criada id={} ({}ms)", salva.getId(), (System.currentTimeMillis() - start));
+        System.out.println("[VagasVoluntariasService] candidatar OK id=" + salva.getId());
+        return ResponseEntity.ok(salva);
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> getTodasVagasDisponiveis() {
-        List<VagaInstituicao> vagas = vagaRepo.findAll();
-        return ResponseEntity.ok(vagas);
-    }
-
-    @Transactional(readOnly = true)
-    public ResponseEntity<List<VagasVoluntariasDTO>> getVagasPorVoluntario(Long voluntarioId) {
-        List<VagasVoluntarias> candidaturas = repository.findByVoluntarioId(voluntarioId);
-        List<VagasVoluntariasDTO> dtos = candidaturas.stream()
-                .map(VagasVoluntariasDTO::fromEntity)
+    public List<CandidaturaDTO> listarCandidatosPorVaga(Long vagaId) {
+        long start = System.currentTimeMillis();
+        System.out.println("[VagasVoluntariasService] listarCandidatosPorVaga vagaId=" + vagaId);
+        List<CandidaturaDTO> lista = repository.findByVagaIdFetch(vagaId)
+                .stream()
+                .map(CandidaturaDTO::new)  // construtor a partir de VagasVoluntarias
                 .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
+        log.info("listarCandidatosPorVaga(vagaId={}) -> {} itens ({}ms)",
+                vagaId, lista.size(), (System.currentTimeMillis() - start));
+        return lista;
     }
 }
