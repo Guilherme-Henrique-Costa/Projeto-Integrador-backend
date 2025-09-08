@@ -1,5 +1,6 @@
 package com.example.voluntariadointeligentehub.jwt;
 
+import com.example.voluntariadointeligentehub.entities.Admin;
 import com.example.voluntariadointeligentehub.entities.Instituicao;
 import com.example.voluntariadointeligentehub.entities.Voluntario;
 import io.jsonwebtoken.Jwts;
@@ -40,6 +41,19 @@ public class JwtUtil {
                 .claim("id", instituicao.getId())
                 .claim("tipo", "instituicao")
                 .claim("nome", instituicao.getNome())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .signWith(secretKey, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    // === ADMIN ===
+    public String gerarToken(Admin admin) {
+        return Jwts.builder()
+                .setSubject(admin.getEmail())
+                .claim("id", admin.getId())
+                .claim("tipo", "ADMIN") // Por quê: distingue no filtro e padroniza autoridade
+                .claim("nome", admin.getNome())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(secretKey, SignatureAlgorithm.HS512)
