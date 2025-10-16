@@ -55,4 +55,14 @@ public class CandidaturaController {
         log.info("GET /voluntario/{} -> {} itens ({}ms)", voluntarioId, resp.getBody().size(), (System.currentTimeMillis() - start));
         return resp;
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> atualizarStatusCandidatura(@PathVariable Long id, @RequestParam String status) {
+        boolean atualizado = service.atualizarStatus(id, status);
+        if (atualizado) {
+            return ResponseEntity.ok("Status da candidatura atualizado com sucesso.");
+        } else {
+            return ResponseEntity.badRequest().body("Erro ao atualizar o status da candidatura.");
+        }
+    }
 }

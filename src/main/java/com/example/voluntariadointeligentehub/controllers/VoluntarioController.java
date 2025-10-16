@@ -1,5 +1,6 @@
 package com.example.voluntariadointeligentehub.controllers;
 
+import com.example.voluntariadointeligentehub.dto.VoluntarioEstatisticasDTO;
 import com.example.voluntariadointeligentehub.entities.Voluntario;
 import com.example.voluntariadointeligentehub.services.VoluntarioService;
 import jakarta.validation.Valid;
@@ -20,6 +21,29 @@ public class VoluntarioController {
     @GetMapping("/all")
     public ResponseEntity<List<Voluntario>> findAll() {
         return voluntarioService.findAll();
+    }
+
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<Map<String, Object>> redefinirSenha(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String novaSenha = body.get("senha");
+
+        System.out.println("[VoluntarioController] POST /redefinir-senha email=" + email);
+
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            boolean sucesso = voluntarioService.redefinirSenha(email, novaSenha);
+            resp.put("sucesso", sucesso);
+            resp.put("mensagem", sucesso
+                    ? "Senha redefinida com sucesso."
+                    : "Voluntário não encontrado para o e-mail informado.");
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("sucesso", false);
+            resp.put("mensagem", "Erro ao redefinir senha: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(resp);
+        }
     }
 
     @GetMapping("/{id}")
@@ -71,4 +95,17 @@ public class VoluntarioController {
     public ResponseEntity<List<Voluntario>> search(@RequestParam(required = false) String q) {
         return ResponseEntity.ok(voluntarioService.search(q));
     }
+
+    @GetMapping("/{id}/recomendacoes")
+    public ResponseEntity<List<Map<String, Object>>> getRecomendacoes(@PathVariable Long id) {
+        List<Map<String, Object>> recomendacoes = voluntarioService.getRecomendacoes(id);
+        return ResponseEntity.ok(recomendacoes);
+    }
+
+    @GetMapping("/{id}/estatisticas")
+    public ResponseEntity<VoluntarioEstatisticasDTO> obterEstatisticas(@PathVariable Long id) {
+        VoluntarioEstatisticasDTO stats = voluntarioService.obterEstatisticas(id);
+        return ResponseEntity.ok(stats);
+    }
+
 }

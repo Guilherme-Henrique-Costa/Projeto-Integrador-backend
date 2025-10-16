@@ -242,4 +242,23 @@ public class InstituicaoService {
                     return ResponseEntity.notFound().build();
                 });
     }
+
+    @Transactional
+    public boolean redefinirSenha(String email, String novaSenha) {
+        System.out.println("[InstituicaoService] redefinirSenha email=" + email);
+        Optional<Instituicao> opt = instituicaoRepository.findByEmail(email);
+
+        if (opt.isEmpty()) {
+            log.warn("Tentativa de redefinir senha - e-mail não encontrado: {}", email);
+            return false;
+        }
+
+        Instituicao inst = opt.get();
+        inst.setSenha(passwordEncoder.encode(novaSenha));
+        instituicaoRepository.save(inst);
+
+        log.info("Senha redefinida com sucesso para email='{}'", email);
+        return true;
+    }
+
 }

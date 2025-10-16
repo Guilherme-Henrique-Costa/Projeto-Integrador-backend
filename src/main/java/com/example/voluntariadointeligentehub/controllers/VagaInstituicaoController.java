@@ -3,6 +3,7 @@ package com.example.voluntariadointeligentehub.controllers;
 import com.example.voluntariadointeligentehub.entities.Instituicao;
 import com.example.voluntariadointeligentehub.entities.VagaInstituicao;
 import com.example.voluntariadointeligentehub.repositories.InstituicaoRepository;
+import com.example.voluntariadointeligentehub.repositories.VagaInstituicaoRepository;
 import com.example.voluntariadointeligentehub.services.VagaInstituicaoService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -96,5 +97,12 @@ public class VagaInstituicaoController {
         long took = System.currentTimeMillis() - start;
         log.info("Listar vagas com candidatos -> {} itens ({}ms)", lista.size(), took);
         return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/vagasDisponiveis")
+    public ResponseEntity<List<VagaInstituicao>> compatVagasDisponiveis() {
+        log.info("[GET] /api/v1/vagasDisponiveis");
+        List<VagaInstituicao> vagas = service.listar();
+        return ResponseEntity.ok(vagas);
     }
 }

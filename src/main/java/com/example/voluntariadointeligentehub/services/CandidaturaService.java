@@ -71,4 +71,21 @@ public class CandidaturaService {
         System.out.println("[CandidaturaService] cadastrar OK id=" + nova.getId());
         return ResponseEntity.ok(new CandidaturaDTO(nova));
     }
+
+    @Transactional
+    public boolean atualizarStatus(Long candidaturaId, String status) {
+        Candidatura candidatura = candidaturaRepository.findById(candidaturaId).orElse(null);
+        if (candidatura == null) {
+            return false;
+        }
+
+        // Atualiza o status se for um valor válido
+        if ("Pendente".equals(status) || "Aprovado".equals(status)) {
+            candidatura.setStatus(status);
+            candidaturaRepository.save(candidatura);
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -20,7 +20,6 @@ public class GestaoInstituicaoController {
 
     private final GestaoInstituicaoService service;
 
-    // ==== injeção por construtor (sem Lombok) ====
     public GestaoInstituicaoController(GestaoInstituicaoService service) {
         this.service = service;
     }

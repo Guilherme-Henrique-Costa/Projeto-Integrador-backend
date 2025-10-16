@@ -1,5 +1,6 @@
 package com.example.voluntariadointeligentehub.controllers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +25,51 @@ public class InstituicaoController {
 
     @Autowired
     private InstituicaoService instituicaoService;
+
+    @GetMapping("/verificar-email")
+    public ResponseEntity<Map<String, Object>> verificarEmail(@RequestParam String email) {
+        System.out.println("[InstituicaoController] GET /verificar-email?email=" + email);
+        log.info("Verificando e-mail da instituição '{}'", email);
+
+        Optional<Instituicao> opt = instituicaoService.buscarPorEmail(email);
+        Map<String, Object> resposta = new HashMap<>();
+
+        if (opt.isPresent()) {
+            Instituicao inst = opt.get();
+            resposta.put("existe", true);
+            resposta.put("id", inst.getId());
+            resposta.put("nome", inst.getNome());
+            return ResponseEntity.ok(resposta);
+        } else {
+            resposta.put("existe", false);
+            return ResponseEntity.ok(resposta);
+        }
+    }
+
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<Map<String, Object>> redefinirSenha(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String novaSenha = body.get("senha");
+
+        System.out.println("[InstituicaoController] POST /redefinir-senha email=" + email);
+        log.info("Redefinindo senha para email='{}'", email);
+
+        try {
+            boolean sucesso = instituicaoService.redefinirSenha(email, novaSenha);
+            Map<String, Object> resposta = new HashMap<>();
+            resposta.put("sucesso", sucesso);
+            resposta.put("mensagem", sucesso
+                    ? "Senha redefinida com sucesso."
+                    : "Instituição não encontrada para o e-mail informado.");
+
+            return ResponseEntity.ok(resposta);
+
+        } catch (Exception e) {
+            log.error("Erro ao redefinir senha: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("erro", "Falha ao redefinir senha."));
+        }
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Instituicao>> findAll() {
