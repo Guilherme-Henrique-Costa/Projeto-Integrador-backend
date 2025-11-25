@@ -147,7 +147,7 @@ public class VoluntarioService {
                 .filter(v -> !idsCandidatadas.contains(v.getId()))
                 .toList();
 
-        // 🔹 Junta listas de causas e habilidades em strings (evita erro de List.toLowerCase)
+        // 🔹 Junta listas de causas e habilidades em strings
         String causas = voluntario.getCausas() != null
                 ? String.join(",", voluntario.getCausas()).toLowerCase()
                 : "";
@@ -172,20 +172,22 @@ public class VoluntarioService {
                 })
                 .toList();
 
-        // 🔹 Monta resposta leve para JSON
-        List<Map<String, Object>> resposta = vagasCompatíveis.stream().map(v -> {
-            Map<String, Object> vagaMap = new LinkedHashMap<>();
-            vagaMap.put("id", v.getId());
-            vagaMap.put("cargo", v.getCargo());
-            vagaMap.put("descricao", v.getDescricao());
-            vagaMap.put("localidade", v.getLocalidade());
-            vagaMap.put("instituicao", v.getInstituicao() != null ? v.getInstituicao().getNome() : "Não informada");
-            vagaMap.put("tipoVaga", v.getTipoVaga());
-            vagaMap.put("area", v.getArea());
-            vagaMap.put("disponibilidade", v.getDisponibilidade());
-            vagaMap.put("status", "Recomendada");
-            return vagaMap;
-        }).toList();
+        // 🔹 Torna a lista mutável (para poder adicionar itens depois)
+        List<Map<String, Object>> resposta = new ArrayList<>(
+                vagasCompatíveis.stream().map(v -> {
+                    Map<String, Object> vagaMap = new LinkedHashMap<>();
+                    vagaMap.put("id", v.getId());
+                    vagaMap.put("cargo", v.getCargo());
+                    vagaMap.put("descricao", v.getDescricao());
+                    vagaMap.put("localidade", v.getLocalidade());
+                    vagaMap.put("instituicao", v.getInstituicao() != null ? v.getInstituicao().getNome() : "Não informada");
+                    vagaMap.put("tipoVaga", v.getTipoVaga());
+                    vagaMap.put("area", v.getArea());
+                    vagaMap.put("disponibilidade", v.getDisponibilidade());
+                    vagaMap.put("status", "Recomendada");
+                    return vagaMap;
+                }).toList()
+        );
 
         // 🔹 Caso não haja nenhuma vaga compatível
         if (resposta.isEmpty()) {
@@ -196,6 +198,7 @@ public class VoluntarioService {
 
         return resposta;
     }
+
 
     @Transactional
     public boolean redefinirSenha(String email, String novaSenha) {
